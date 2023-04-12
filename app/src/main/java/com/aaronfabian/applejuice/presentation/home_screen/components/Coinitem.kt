@@ -1,6 +1,5 @@
 package com.aaronfabian.applejuice.presentation.home_screen.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
@@ -24,18 +23,22 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier
          .clickable {
-            val stringBuilder = StringBuilder()
+            val strCoinId = StringBuilder()
 
             val getCoinSymbol = coinInfo.symbol
             val getCoinName = coinInfo.name
 
-            stringBuilder.append(getCoinSymbol.toLowerCase())
-            stringBuilder.append('-')
-            stringBuilder.append(getCoinName.toLowerCase())
+            strCoinId.append(getCoinSymbol.toLowerCase())
+            strCoinId.append('-')
+            strCoinId.append(
+               getCoinName
+                  .toLowerCase()
+                  .replace(' ', '-')
+            )
 
-            println(stringBuilder)
+            println(strCoinId)
 
-            navController.navigate(Screen.CoinDetailScreen.route + "/${stringBuilder}")
+            navController.navigate(Screen.CoinDetailScreen.route + "/${strCoinId}")
          }
          .height(80.dp)
          .fillMaxWidth()
@@ -63,14 +66,12 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
          )
       }
 
-      Column(
+      Box(
          modifier = Modifier
             .weight(1.5f)
             .fillMaxHeight()
-            .background(Color.Blue)
       ) {
-         // TODO: implement graphic
-
+         StockChart()
       }
 
       Column(
@@ -95,3 +96,4 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
       }
    }
 }
+

@@ -33,7 +33,6 @@ fun HomeScreen(
 ) {
 
    val state = viewModel.state.value
-
    var tfSearchState by remember {
       mutableStateOf("")
    }
@@ -79,7 +78,7 @@ fun HomeScreen(
                      shape = RoundedCornerShape(16.dp)
                   )
             )
-            IconButton(onClick = {}) {
+            IconButton(onClick = { }) {
                Icon(
                   tint = Color.Gray,
                   painter = painterResource(id = R.drawable.ic_ribbon),
@@ -87,11 +86,11 @@ fun HomeScreen(
                )
             }
 
-            IconButton(onClick = {}) {
+            IconButton(onClick = { }) {
                Icon(
                   tint = Color.Gray,
                   painter = painterResource(id = R.drawable.baseline_notifications_24),
-                  contentDescription = "Wishlist icon button"
+                  contentDescription = "Notification icon button"
                )
             }
          } // Header

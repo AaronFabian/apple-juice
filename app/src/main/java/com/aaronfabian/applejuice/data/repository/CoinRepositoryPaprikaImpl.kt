@@ -11,6 +11,7 @@ class CoinRepositoryPaprikaImpl @Inject constructor(
    override suspend fun getCoinDetailById(coinId: String): CoinDetailDto {
       return paprikaApi.getCoinDetailById(coinId)
    }
+}
 
 //    normal way to call api
 //      override suspend fun getCoinDetailById(coinId: String): CoinDetailDto {
@@ -22,4 +23,3 @@ class CoinRepositoryPaprikaImpl @Inject constructor(
 //
 //         return api.getCoinDetailById(coinId)
 //      }
-}
