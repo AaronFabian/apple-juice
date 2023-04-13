@@ -24,4 +24,6 @@ class GetDetailCoinUseCase @Inject constructor(
          emit(Resource.Error<CoinDetail>("Couldn't reach server. Check your internet connection."))
       }
    }
+
+
 }

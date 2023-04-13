@@ -1,11 +1,9 @@
 package com.aaronfabian.applejuice.presentation.coin_detail_screen
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,8 +20,10 @@ import androidx.navigation.NavController
 import com.aaronfabian.applejuice.R
 import com.aaronfabian.applejuice.domain.model.CoinDetail
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.Overview
+import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.PeopleItem
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.VerticalDivider
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
+import com.google.accompanist.flowlayout.FlowRow
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -36,7 +36,7 @@ fun CoinDetailScreen(
    val state = viewModel.state.value
 
    if (state.coin != null) {
-      CoinDetailScreenContent(state.coin)
+      CoinDetailScreenContent(state.coin, navController)
    }
 
 
@@ -61,7 +61,7 @@ fun CoinDetailScreen(
 }
 
 @Composable
-fun CoinDetailScreenContent(dataState: CoinDetail) {
+fun CoinDetailScreenContent(dataState: CoinDetail, navController: NavController) {
 
    var coinDetailScreenState by remember {
       mutableStateOf("overview")
@@ -259,52 +259,30 @@ fun CoinDetailScreenContent(dataState: CoinDetail) {
                   start.linkTo(parent.start)
                }
          ) {
-            Column(
-               verticalArrangement = Arrangement.SpaceBetween,
-               modifier = Modifier
-                  .clickable { coinDetailScreenState = "overview" }
-                  .width(intrinsicSize = IntrinsicSize.Min)
-                  .fillMaxHeight()
-            ) {
-               Text(
-                  text = "Overview",
-                  fontSize = 18.sp,
-                  fontWeight = FontWeight.SemiBold,
-                  color = Color.DarkGray
-               )
-               Divider(thickness = 3.dp, color = mPrimary)
-            }
 
-            Column(
-               verticalArrangement = Arrangement.SpaceBetween,
-               modifier = Modifier
-                  .clickable { coinDetailScreenState = "requirements" }
-                  .width(intrinsicSize = IntrinsicSize.Min)
-                  .fillMaxHeight()
-            ) {
-               Text(
-                  text = "Requirements",
-                  fontSize = 18.sp,
-                  fontWeight = FontWeight.SemiBold,
-                  color = Color.DarkGray
-               )
-               // Divider(thickness = 3.dp, color = mPrimary)
-            }
+            val navbarTextArr = HashMap<String, String>()
+            navbarTextArr["overview"] = "Overview"
+            navbarTextArr["related"] = "Related"
+            navbarTextArr["about"] = "About"
 
-            Column(
-               verticalArrangement = Arrangement.SpaceBetween,
-               modifier = Modifier
-                  .clickable { coinDetailScreenState = "about" }
-                  .fillMaxHeight()
-                  .width(intrinsicSize = IntrinsicSize.Min)
-            ) {
-               Text(
-                  text = "About",
-                  fontSize = 18.sp,
-                  fontWeight = FontWeight.SemiBold,
-                  color = Color.DarkGray
-               )
-               // Divider(thickness = 3.dp, color = mPrimary)
+            navbarTextArr.forEach { it ->
+               Column(
+                  verticalArrangement = Arrangement.SpaceBetween,
+                  modifier = Modifier
+                     .clickable { coinDetailScreenState = it.key }
+                     .width(intrinsicSize = IntrinsicSize.Min)
+                     .fillMaxHeight()
+               ) {
+                  Text(
+                     text = it.value,
+                     fontSize = 18.sp,
+                     fontWeight = FontWeight.SemiBold,
+                     color = Color.DarkGray
+                  )
+
+                  if (it.key == coinDetailScreenState)
+                     Divider(thickness = 3.dp, color = mPrimary)
+               }
             }
          } // navbar coin detail screen
 
@@ -332,6 +310,8 @@ fun CoinDetailScreenContent(dataState: CoinDetail) {
                val textDescription = createRef()
                val textFounder = createRef()
                val textFounderName = createRef()
+               val textTag = createRef()
+               val flowRowTag = createRef()
 
                val textTitleModifier = Modifier
                   .constrainAs(textTitle) {
@@ -362,7 +342,29 @@ fun CoinDetailScreenContent(dataState: CoinDetail) {
                   }
 
                // Requirements Ref
-               val textTeam = createRef()
+               val containerTeam = createRef()
+
+               val containerTeamModifier = Modifier
+                  .fillMaxWidth()
+                  .padding(top = 16.dp)
+                  .constrainAs(containerTeam) {
+                     top.linkTo(textTitle.bottom)
+                     start.linkTo(parent.start)
+                  }
+
+               val textTagModifier = Modifier
+                  .padding(top = 16.dp)
+                  .constrainAs(textTag) {
+                     top.linkTo(containerTeam.bottom)
+                     start.linkTo(parent.start)
+                  }
+
+               val flowRowTagsModifier = Modifier
+                  .padding(top = 16.dp)
+                  .constrainAs(flowRowTag) {
+                     top.linkTo(textTag.bottom)
+                     start.linkTo(parent.start)
+                  }
 
                when (coinDetailScreenState) {
                   "overview" -> {
@@ -375,10 +377,67 @@ fun CoinDetailScreenContent(dataState: CoinDetail) {
 
                      Overview(dataState = dataState, modifierHashMap = modifierHashMap)
                   }
-                  "requirements" -> {
+                  "related" -> {
 
                      val modifierHashMap = HashMap<String, Modifier>()
+                     modifierHashMap["textTitleModifier"] = textTitleModifier
+                     modifierHashMap["containerTeam"] = containerTeamModifier
+                     modifierHashMap["textTagModifier"] = textTagModifier
+                     modifierHashMap["flowRowTagsModifier"] = flowRowTagsModifier
 
+                     Text(
+                        text = "Key people and related",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = textTitleModifier
+                     )
+
+                     Column(modifier = containerTeamModifier) {
+                        dataState.team?.forEach { it ->
+                           val nameArr = it.name.split(" ")
+                           val initalName = nameArr
+                              .take(3)
+                              .map { it[0] }
+                              .joinToString("")
+
+                           PeopleItem(team = it, initialName = initalName)
+                        }
+                     }
+
+                     Text(
+                        text = "Tags",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = textTagModifier
+                     )
+
+                     FlowRow(
+                        mainAxisSpacing = 10.dp,
+                        crossAxisSpacing = 10.dp,
+                        modifier = flowRowTagsModifier
+                     ) {
+
+                        dataState.tags?.forEach { tag ->
+                           Box(
+                              modifier = Modifier
+                                 .clickable { println(tag.id) }
+                                 .border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colors.primary,
+                                    shape = RoundedCornerShape(100.dp)
+                                 )
+                                 .padding(10.dp)
+                           ) {
+
+                              Text(
+                                 text = tag.name,
+                                 color = MaterialTheme.colors.primary,
+                                 textAlign = TextAlign.Center,
+                                 style = MaterialTheme.typography.body2
+                              )
+                           }
+                        }
+                     }
                   }
                   "about" -> {
                      Text(

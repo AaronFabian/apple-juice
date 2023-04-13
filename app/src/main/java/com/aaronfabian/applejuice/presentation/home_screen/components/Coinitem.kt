@@ -47,7 +47,7 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
 
       Column(
          modifier = Modifier
-            .weight(.8f)
+            .weight(1f)
             .fillMaxHeight()
       ) {
          Text(
@@ -69,9 +69,9 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
       Box(
          modifier = Modifier
             .weight(1.5f)
-            .fillMaxHeight()
+            .height(54.dp)
       ) {
-         StockChart()
+         StockChart(infos = coinInfo.sparkline, changeColor = coinInfo.change.toFloat())
       }
 
       Column(

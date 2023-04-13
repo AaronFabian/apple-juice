@@ -2,6 +2,7 @@ package com.aaronfabian.applejuice.data.repository
 
 import com.aaronfabian.applejuice.data.remote.CoinPaprikaApi
 import com.aaronfabian.applejuice.data.remote.dto.CoinDetailDto
+import com.aaronfabian.applejuice.data.remote.dto.CoinPeopleDetailDto
 import javax.inject.Inject
 
 class CoinRepositoryPaprikaImpl @Inject constructor(
@@ -10,6 +11,10 @@ class CoinRepositoryPaprikaImpl @Inject constructor(
 
    override suspend fun getCoinDetailById(coinId: String): CoinDetailDto {
       return paprikaApi.getCoinDetailById(coinId)
+   }
+
+   override suspend fun getPeopleDetailById(peopleId: String): CoinPeopleDetailDto {
+      return paprikaApi.getPeopleDetailById(peopleId)
    }
 }
 
