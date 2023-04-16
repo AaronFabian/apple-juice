@@ -19,7 +19,11 @@ class GetPeopleDetailUseCase @Inject constructor(
          val coin = repository.getPeopleDetailById(coinId).toCoinPeopleDetail()
          emit(Resource.Success<CoinPeopleDetail>(coin))
       } catch (e: HttpException) {
-         emit(Resource.Error<CoinPeopleDetail>(e.localizedMessage ?: "An unexpected error occured"))
+         emit(
+            Resource.Error<CoinPeopleDetail>(
+               e.localizedMessage ?: "An unexpected error occurred"
+            )
+         )
       } catch (e: IOException) {
          emit(Resource.Error<CoinPeopleDetail>("Couldn't reach server. Check your internet connection."))
       }

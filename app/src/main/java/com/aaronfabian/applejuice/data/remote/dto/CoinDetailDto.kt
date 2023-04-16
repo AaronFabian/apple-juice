@@ -49,6 +49,7 @@ fun CoinDetailDto.toCoinDetailModel(): CoinDetail {
       tags = tags,
       team = team,
       type = type,
-      whitepaper = whitepaper
+      whitepaper = whitepaper,
+      logo = logo
    )
 }

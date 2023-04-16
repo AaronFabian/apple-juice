@@ -7,15 +7,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -25,7 +29,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aaronfabian.applejuice.R
 import com.aaronfabian.applejuice.presentation.home_screen.components.CoinItem
+import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
+import com.aaronfabian.applejuice.presentation.ui.theme.mTextPrimary
 
+@OptIn(ExperimentalComposeUiApi::class) // ??
 @Composable
 fun HomeScreen(
    navController: NavController,
@@ -33,9 +40,12 @@ fun HomeScreen(
 ) {
 
    val state = viewModel.state.value
+
    var tfSearchState by remember {
       mutableStateOf("")
    }
+   val listState = rememberLazyListState()
+   val keyboardController = LocalSoftwareKeyboardController.current
 
    Box(Modifier.padding(top = 12.dp, start = 8.dp, end = 8.dp)) {
 
@@ -57,18 +67,21 @@ fun HomeScreen(
             TextField(
                onValueChange = { it -> tfSearchState = it },
                value = tfSearchState,
-               label = { Text(text = "Search Food, Vegetable, etc", fontSize = 12.sp) },
+               label = { Text(text = "Search Coin...", fontSize = 12.sp, color = mTextPrimary) },
                singleLine = true,
                leadingIcon = {
                   Icon(
+                     tint = Color.LightGray,
                      imageVector = Icons.Rounded.Search,
                      contentDescription = "Search"
                   )
                },
                colors = TextFieldDefaults.textFieldColors(
-                  backgroundColor = Color.White,
+                  backgroundColor = Color.Transparent,
                   focusedIndicatorColor = Color.Transparent,
-                  unfocusedIndicatorColor = Color.Transparent
+                  unfocusedIndicatorColor = Color.Transparent,
+                  textColor = mTextPrimary,
+                  cursorColor = mPrimary
                ),
                shape = RoundedCornerShape(8.dp),
                modifier = Modifier
@@ -76,7 +89,12 @@ fun HomeScreen(
                   .border(
                      BorderStroke(width = 1.dp, color = Color.LightGray),
                      shape = RoundedCornerShape(16.dp)
-                  )
+                  ),
+               keyboardActions = KeyboardActions(onDone = {
+
+                  keyboardController?.hide()
+                  println(tfSearchState)
+               })
             )
             IconButton(onClick = { }) {
                Icon(
@@ -124,7 +142,7 @@ fun HomeScreen(
                      modifier = Modifier
                         .background(Color(0xFF0052FF))
                         .width(40.dp)
-                        .height(4.dp)
+                        .height(6.dp)
                   )
                }
             }
@@ -167,7 +185,7 @@ fun HomeScreen(
          )
 
          Column(modifier = Modifier
-            .border(width = .5.dp, color = Color.LightGray, shape = RoundedCornerShape(12.dp))
+            .border(width = .5.dp, color = mPrimary, shape = RoundedCornerShape(12.dp))
             .constrainAs(filterBtn) {
                top.linkTo(dividerToolbar.bottom)
             }) {
@@ -177,20 +195,20 @@ fun HomeScreen(
             ) {
                Row(modifier = Modifier.padding(start = 8.dp, end = 8.dp)) {
                   Icon(
-                     tint = Color(0xFF363636),
+                     tint = mPrimary,
                      painter = painterResource(id = R.drawable.ic_filter),
                      contentDescription = "Button Filter",
                      modifier = Modifier.scale(.8f)
                   )
 
-                  Text(text = "Filter", color = Color(0xFF363636))
+                  Text(text = "Filter", color = mPrimary)
                }
             }
          } // help button
 
          Column(modifier = Modifier
             .offset(x = 8.dp)
-            .border(width = .5.dp, color = Color.LightGray, shape = RoundedCornerShape(12.dp))
+            .border(width = .5.dp, color = mPrimary, shape = RoundedCornerShape(12.dp))
             .constrainAs(sortBtn) {
                top.linkTo(dividerToolbar.bottom)
                start.linkTo(filterBtn.end)
@@ -201,20 +219,20 @@ fun HomeScreen(
             ) {
                Row(modifier = Modifier.padding(start = 8.dp, end = 8.dp)) {
                   Icon(
-                     tint = Color(0xFF363636),
+                     tint = mPrimary,
                      painter = painterResource(id = R.drawable.ic_sort),
                      contentDescription = "Button Filter",
                      modifier = Modifier.scale(.8f)
                   )
 
-                  Text(text = "Filter", color = Color(0xFF363636))
+                  Text(text = "Filter", color = mPrimary)
                }
             }
          } // help button
 
          // start lazy column
          if (state.coin?.data?.coins != null) {
-            LazyColumn(modifier = Modifier
+            LazyColumn(state = listState, modifier = Modifier
                .padding(top = 20.dp)
                .height(550.dp)
                .constrainAs(containerCoinList) {
@@ -225,6 +243,7 @@ fun HomeScreen(
                   CoinItem(coin, navController)
                }
             }
+
          }
 
          if (state.error.isNotBlank()) {

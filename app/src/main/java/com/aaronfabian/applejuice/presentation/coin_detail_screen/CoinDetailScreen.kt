@@ -3,12 +3,15 @@ package com.aaronfabian.applejuice.presentation.coin_detail_screen
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -17,13 +20,17 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.ImageLoader
+import coil.compose.LocalImageLoader
+import coil.compose.rememberImagePainter
+import coil.decode.SvgDecoder
 import com.aaronfabian.applejuice.R
 import com.aaronfabian.applejuice.domain.model.CoinDetail
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.Overview
-import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.PeopleItem
+import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.Related
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.VerticalDivider
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
-import com.google.accompanist.flowlayout.FlowRow
+import com.aaronfabian.applejuice.presentation.ui.theme.mTextPrimary
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -61,10 +68,13 @@ fun CoinDetailScreen(
 }
 
 @Composable
-fun CoinDetailScreenContent(dataState: CoinDetail, navController: NavController) {
+fun CoinDetailScreenContent(
+   dataState: CoinDetail,
+   navController: NavController,
+) {
 
    var coinDetailScreenState by remember {
-      mutableStateOf("overview")
+      mutableStateOf("price")
    }
 
    val inputTime = dataState.started_at
@@ -117,7 +127,7 @@ fun CoinDetailScreenContent(dataState: CoinDetail, navController: NavController)
                text = dataState.name ?: "Err",
                fontSize = 18.sp,
                fontWeight = FontWeight.Bold,
-               color = Color.DarkGray
+               color = mTextPrimary
             )
 
             IconButton(
@@ -188,13 +198,13 @@ fun CoinDetailScreenContent(dataState: CoinDetail, navController: NavController)
                         fontSize = 12.sp,
                         text = "Start at",
                         fontWeight = FontWeight.Thin,
-                        color = Color(0xFF000000)
+                        color = mTextPrimary
                      )
                      Text(
                         fontSize = 14.sp,
                         text = formattedTime,
                         fontWeight = FontWeight.Normal,
-                        color = Color.Black
+                        color = mTextPrimary
                      )
                   }
 
@@ -211,13 +221,13 @@ fun CoinDetailScreenContent(dataState: CoinDetail, navController: NavController)
                         fontSize = 12.sp,
                         text = "Rank",
                         fontWeight = FontWeight.Thin,
-                        color = Color(0xFF000000)
+                        color = mTextPrimary
                      )
                      Text(
                         fontSize = 16.sp,
                         text = "${dataState.rank}",
                         fontWeight = FontWeight.Normal,
-                        color = Color.Black
+                        color = mTextPrimary
                      )
                   }
 
@@ -234,13 +244,13 @@ fun CoinDetailScreenContent(dataState: CoinDetail, navController: NavController)
                         fontSize = 12.sp,
                         text = "Is active",
                         fontWeight = FontWeight.Thin,
-                        color = Color(0xFF000000)
+                        color = mTextPrimary
                      )
                      Text(
                         fontSize = 16.sp,
                         text = "Yes",
                         fontWeight = FontWeight.Normal,
-                        color = Color.Black
+                        color = mTextPrimary
                      )
                   }
                }
@@ -260,10 +270,10 @@ fun CoinDetailScreenContent(dataState: CoinDetail, navController: NavController)
                }
          ) {
 
-            val navbarTextArr = HashMap<String, String>()
-            navbarTextArr["overview"] = "Overview"
+            val navbarTextArr = LinkedHashMap<String, String>()
+            navbarTextArr["price"] = "Price"
             navbarTextArr["related"] = "Related"
-            navbarTextArr["about"] = "About"
+            navbarTextArr["overview"] = "Overview"
 
             navbarTextArr.forEach { it ->
                Column(
@@ -277,7 +287,7 @@ fun CoinDetailScreenContent(dataState: CoinDetail, navController: NavController)
                      text = it.value,
                      fontSize = 18.sp,
                      fontWeight = FontWeight.SemiBold,
-                     color = Color.DarkGray
+                     color = if (it.key == coinDetailScreenState) mPrimary else mTextPrimary
                   )
 
                   if (it.key == coinDetailScreenState)
@@ -288,7 +298,6 @@ fun CoinDetailScreenContent(dataState: CoinDetail, navController: NavController)
 
 
          // start coin detail screen navigation
-         println(coinDetailScreenState)
          Box(
             modifier = Modifier
                .constrainAs(screenCoinDetailState) {
@@ -296,7 +305,7 @@ fun CoinDetailScreenContent(dataState: CoinDetail, navController: NavController)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
                }
-               .height(320.dp)
+               .height(310.dp)
                .verticalScroll(rememberScrollState())
          ) {
             ConstraintLayout(
@@ -360,13 +369,38 @@ fun CoinDetailScreenContent(dataState: CoinDetail, navController: NavController)
                   }
 
                val flowRowTagsModifier = Modifier
-                  .padding(top = 16.dp)
+                  .padding(top = 16.dp, bottom = 8.dp)
                   .constrainAs(flowRowTag) {
                      top.linkTo(textTag.bottom)
                      start.linkTo(parent.start)
                   }
 
                when (coinDetailScreenState) {
+                  "price" -> {
+
+                     val imageLoader = ImageLoader.Builder(LocalContext.current).componentRegistry {
+                        add(SvgDecoder(LocalContext.current))
+                     }.build()
+
+                     CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+                        val painter = rememberImagePainter(dataState.logo)
+
+                        Image(
+                           painter = painter,
+                           contentDescription = "SVG image",
+                           contentScale = ContentScale.FillBounds,
+                           modifier = Modifier
+                              .padding(start = 8.dp, end = 8.dp, top = 16.dp)
+                              .size(46.dp)
+                              .clip(CircleShape)
+                              .constrainAs(textTitle) {
+                                 top.linkTo(parent.top)
+                                 start.linkTo(parent.start)
+                                 end.linkTo(parent.end)
+                              }
+                        )
+                     }
+                  }
                   "overview" -> {
 
                      val modifierHashMap = HashMap<String, Modifier>()
@@ -381,70 +415,16 @@ fun CoinDetailScreenContent(dataState: CoinDetail, navController: NavController)
 
                      val modifierHashMap = HashMap<String, Modifier>()
                      modifierHashMap["textTitleModifier"] = textTitleModifier
-                     modifierHashMap["containerTeam"] = containerTeamModifier
+                     modifierHashMap["containerTeamModifier"] = containerTeamModifier
                      modifierHashMap["textTagModifier"] = textTagModifier
                      modifierHashMap["flowRowTagsModifier"] = flowRowTagsModifier
 
-                     Text(
-                        text = "Key people and related",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = textTitleModifier
+                     Related(
+                        modifier = modifierHashMap,
+                        navController = navController,
+                        team = dataState.team,
+                        tags = dataState.tags
                      )
-
-                     Column(modifier = containerTeamModifier) {
-                        dataState.team?.forEach { it ->
-                           val nameArr = it.name.split(" ")
-                           val initalName = nameArr
-                              .take(3)
-                              .map { it[0] }
-                              .joinToString("")
-
-                           PeopleItem(team = it, initialName = initalName)
-                        }
-                     }
-
-                     Text(
-                        text = "Tags",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = textTagModifier
-                     )
-
-                     FlowRow(
-                        mainAxisSpacing = 10.dp,
-                        crossAxisSpacing = 10.dp,
-                        modifier = flowRowTagsModifier
-                     ) {
-
-                        dataState.tags?.forEach { tag ->
-                           Box(
-                              modifier = Modifier
-                                 .clickable { println(tag.id) }
-                                 .border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colors.primary,
-                                    shape = RoundedCornerShape(100.dp)
-                                 )
-                                 .padding(10.dp)
-                           ) {
-
-                              Text(
-                                 text = tag.name,
-                                 color = MaterialTheme.colors.primary,
-                                 textAlign = TextAlign.Center,
-                                 style = MaterialTheme.typography.body2
-                              )
-                           }
-                        }
-                     }
-                  }
-                  "about" -> {
-                     Text(
-                        text = "about",
-                        modifier = Modifier.constrainAs(textTitle) {
-                           top.linkTo(parent.top); start.linkTo(parent.start)
-                        })
                   }
                }
             }

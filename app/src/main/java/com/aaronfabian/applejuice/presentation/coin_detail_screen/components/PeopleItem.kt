@@ -12,13 +12,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.aaronfabian.applejuice.data.remote.dto.Team
+import com.aaronfabian.applejuice.presentation.Screen
 
 @Composable
-fun PeopleItem(team: Team, initialName: String) {
+fun PeopleItem(team: Team, initialName: String, navController: NavController) {
    Row(
       modifier = Modifier
-         .clickable { println(team.id) }
+         .clickable {
+            println(team.id)
+            navController.navigate(Screen.PeopleDetailScreen.route + "/${team.id}")
+         }
          .fillMaxWidth()
          .height(64.dp)
    ) {
@@ -58,4 +63,6 @@ fun PeopleItem(team: Team, initialName: String) {
          )
       }
    }
+
+
 }

@@ -40,4 +40,6 @@ fun Overview(dataState: CoinDetail, modifierHashMap: HashMap<String, Modifier>) 
       text = getName,
       modifier = modifierHashMap["textFounderNameModifier"]!!
    )
+
+   modifierHashMap.clear()
 }

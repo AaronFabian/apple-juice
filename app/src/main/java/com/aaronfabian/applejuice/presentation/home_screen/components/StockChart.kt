@@ -16,7 +16,11 @@ fun StockChart(
    modifier: Modifier = Modifier,
 ) {
 
-   val sortedFloatSparkLine = infos.map { it.toFloat() }.sorted()
+   val sortedFloatSparkLine = infos
+      .asSequence()
+      .mapNotNull { it.toFloatOrNull() }
+      .sortedDescending()
+      .toList()
 
    // canvas size is 530.0px x 280.0px
    // 1.dp = 3.5px

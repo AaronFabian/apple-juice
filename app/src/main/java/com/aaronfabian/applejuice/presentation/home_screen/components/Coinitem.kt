@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.aaronfabian.applejuice.data.remote.dto.Coin
 import com.aaronfabian.applejuice.presentation.Screen
+import com.aaronfabian.applejuice.presentation.ui.theme.mTextPrimary
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -53,7 +54,7 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
          Text(
             text = coinInfo.symbol,
             fontSize = 18.sp,
-            color = Color.DarkGray,
+            color = mTextPrimary,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 14.dp, start = 4.dp)
          )
@@ -84,7 +85,7 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
 
          Text(
             text = "$${BigDecimal(coinInfo.price).setScale(2, RoundingMode.HALF_EVEN)}",
-            color = Color.DarkGray,
+            color = mTextPrimary,
             fontStyle = FontStyle.Italic,
             fontSize = 20.sp
          )

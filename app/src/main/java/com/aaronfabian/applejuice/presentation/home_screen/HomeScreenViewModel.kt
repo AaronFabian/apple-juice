@@ -22,7 +22,7 @@ class HomeScreenViewModel @Inject constructor(
       getAllCoinsList()
    }
 
-   fun getAllCoinsList() {
+   private fun getAllCoinsList() {
       getAllCoinsUseCase().onEach { response ->
 
          when (response) {

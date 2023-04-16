@@ -3,6 +3,8 @@ package com.aaronfabian.applejuice.data.repository
 import com.aaronfabian.applejuice.data.remote.CoinPaprikaApi
 import com.aaronfabian.applejuice.data.remote.dto.CoinDetailDto
 import com.aaronfabian.applejuice.data.remote.dto.CoinPeopleDetailDto
+import com.aaronfabian.applejuice.data.remote.dto.CoinTagDetailDto
+import com.aaronfabian.applejuice.data.remote.dto.CoinTickerDto
 import javax.inject.Inject
 
 class CoinRepositoryPaprikaImpl @Inject constructor(
@@ -15,6 +17,14 @@ class CoinRepositoryPaprikaImpl @Inject constructor(
 
    override suspend fun getPeopleDetailById(peopleId: String): CoinPeopleDetailDto {
       return paprikaApi.getPeopleDetailById(peopleId)
+   }
+
+   override suspend fun getCoinTickerById(coinId: String): CoinTickerDto {
+      return paprikaApi.getCoinTickerById(coinId)
+   }
+
+   override suspend fun getCoinTagById(tagId: String): CoinTagDetailDto {
+      return paprikaApi.getTagDetailById(tagId)
    }
 }
 

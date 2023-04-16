@@ -21,5 +21,7 @@ data class CoinDetail(
    val tags: List<Tag>?,
    val team: List<Team>?,
    val type: String?,
-   val whitepaper: Whitepaper?
-)
+   val whitepaper: Whitepaper?,
+   val logo: String,
+
+   )

@@ -6,7 +6,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aaronfabian.applejuice.domain.use_case.GetDetailCoinUseCase
-import com.aaronfabian.applejuice.domain.use_case.GetPeopleDetailUseCase
 import com.aaronfabian.applejuice.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -16,7 +15,6 @@ import javax.inject.Inject
 @HiltViewModel
 class CoinDetailViewModel @Inject constructor(
    private val getCoinUseCase: GetDetailCoinUseCase,
-   private val getPeopleDetailUseCase: GetPeopleDetailUseCase,
    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -46,5 +44,21 @@ class CoinDetailViewModel @Inject constructor(
       }.launchIn(viewModelScope)
    }
 
-   private fun getPeople(peopleId: String) {}
+//   private fun getTicker() {
+//      getCoinTicker(this.storedCoinId).onEach { result ->
+//         when (result) {
+//            is Resource.Success -> {
+//               _stateTicker.value = CoinTickerState(coin = result.data)
+//            }
+//            is Resource.Error -> {
+//               _stateTicker.value = CoinTickerState(
+//                  error = result.message ?: "An unexpected error occurred"
+//               )
+//            }
+//            is Resource.Loading -> {
+//               _stateTicker.value = CoinTickerState(isLoading = true)
+//            }
+//         }
+//      }.launchIn(viewModelScope)
+//   }
 }
