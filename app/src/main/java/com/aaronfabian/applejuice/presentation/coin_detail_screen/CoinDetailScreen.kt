@@ -1,6 +1,8 @@
 package com.aaronfabian.applejuice.presentation.coin_detail_screen
 
+import android.os.Build
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -32,9 +34,14 @@ import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.Rel
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.VerticalDivider
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
 import com.aaronfabian.applejuice.presentation.ui.theme.mTextPrimary
+import com.aaronfabian.applejuice.utils.StringUtil
+import com.aaronfabian.applejuice.utils.dataClass.TablePriceHelperData
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CoinDetailScreen(
    navController: NavController,
@@ -69,6 +76,7 @@ fun CoinDetailScreen(
    }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CoinDetailScreenContent(
    dataState: CoinDetail,
@@ -380,32 +388,197 @@ fun CoinDetailScreenContent(
                      start.linkTo(parent.start)
                   }
 
+               // Price Ref
+               val coinPriceRef = createRef()
+               val textCoinPriceReportRef = createRef()
+               val containerPriceTicker = createRef()
+               val rowButtonRef = createRef()
+
+               val imgCoinIconModifier = Modifier
+                  .padding(start = 8.dp, end = 8.dp, top = 16.dp)
+                  .size(46.dp)
+                  .clip(CircleShape)
+                  .constrainAs(textTitle) {
+                     top.linkTo(parent.top)
+                     start.linkTo(parent.start)
+                     end.linkTo(parent.end)
+                  }
+
+               val coinPriceModifier = Modifier
+                  .padding(top = 8.dp)
+                  .constrainAs(coinPriceRef) {
+                     top.linkTo(textTitle.bottom)
+                     start.linkTo(parent.start)
+                     end.linkTo(parent.end)
+                  }
+
+               val rowButtonModifier = Modifier
+                  .fillMaxWidth()
+                  .padding(top = 8.dp, bottom = 8.dp)
+                  .constrainAs(rowButtonRef) {
+                     top.linkTo(coinPriceRef.bottom)
+                     start.linkTo(parent.start)
+                  }
+
+               val textCoinPriceReportModifier = Modifier
+                  .padding(top = 8.dp, bottom = 8.dp)
+                  .constrainAs(textCoinPriceReportRef) {
+                     top.linkTo(rowButtonRef.bottom)
+                     start.linkTo(parent.start)
+                     end.linkTo(parent.end)
+                  }
+
+               val containerPriceTickerModifier = Modifier
+                  .fillMaxWidth()
+                  .height(intrinsicSize = IntrinsicSize.Min)
+                  .padding(start = 18.dp, end = 18.dp)
+                  .constrainAs(containerPriceTicker) {
+                     top.linkTo(textCoinPriceReportRef.bottom)
+                     start.linkTo(parent.start)
+                  }
+
                when (coinDetailScreenState) {
                   "price" -> {
 
-                     val imageLoader = ImageLoader.Builder(LocalContext.current).componentRegistry {
-                        add(SvgDecoder(LocalContext.current))
-                     }.build()
+                     val modifierHashMap = HashMap<String, Modifier>()
+                     modifierHashMap["imgCoinIconModifier"] = imgCoinIconModifier
+
+                     val imageLoader = ImageLoader
+                        .Builder(LocalContext.current)
+                        .componentRegistry { add(SvgDecoder(LocalContext.current)) }
+                        .build()
 
                      if (dataStateTicker != null) {
+                        val toFixDecimalHelper = { price: Double ->
+                           BigDecimal(price)
+                              .setScale(
+                                 2,
+                                 RoundingMode.HALF_EVEN
+                              )
+                        }
+
+                        val tablePriceDataClass = TablePriceHelperData.getTableData()
+                        val getPriceReportArr = ArrayList<String>()
+
+                        val coinPrice = dataStateTicker.quotes.USD.price // not include in array
+                        val volumeIn24h = dataStateTicker.quotes.USD.volume_24h
+                        val volumeChangeIn24h = dataStateTicker.quotes.USD.volume_24h_change_24h
+                        val marketCap = dataStateTicker.quotes.USD.market_cap.toDouble()
+                        val marketCapChangeIn24h = dataStateTicker.quotes.USD.market_cap_change_24h
+                        val percentChangeIn15m = dataStateTicker.quotes.USD.percent_change_15m
+                        val percentChangeIn30m = dataStateTicker.quotes.USD.percent_change_30m
+                        val percentChangeIn1h = dataStateTicker.quotes.USD.percent_change_1h
+                        val percentChangeIn6h = dataStateTicker.quotes.USD.percent_change_6h
+                        val percentChangeIn12h = dataStateTicker.quotes.USD.percent_change_12h
+                        val percentChangeIn24h = dataStateTicker.quotes.USD.percent_change_24h
+                        val percentChangeIn7d = dataStateTicker.quotes.USD.percent_change_7d
+                        val percentChangeIn30d = dataStateTicker.quotes.USD.percent_change_30d
+                        val percentChangeIn1y = dataStateTicker.quotes.USD.percent_change_1y
+                        val allTimeHighPrice = dataStateTicker.quotes.USD.ath_price
+                        val allTimeDate = dataStateTicker.quotes.USD.ath_date
+                        val percentFromAth = dataStateTicker.quotes.USD.percent_from_price_ath
+
+                        getPriceReportArr.add("$\t${toFixDecimalHelper(volumeIn24h)}")
+                        getPriceReportArr.add("$volumeChangeIn24h")
+                        getPriceReportArr.add("$\t${toFixDecimalHelper(marketCap)}")
+                        getPriceReportArr.add("$marketCapChangeIn24h\t%")
+                        getPriceReportArr.add("$percentChangeIn15m\t%")
+                        getPriceReportArr.add("$percentChangeIn30m\t%")
+                        getPriceReportArr.add("$percentChangeIn1h\t%")
+                        getPriceReportArr.add("$percentChangeIn6h\t%")
+                        getPriceReportArr.add("$percentChangeIn12h\t%")
+                        getPriceReportArr.add("$percentChangeIn24h\t%")
+                        getPriceReportArr.add("$percentChangeIn7d\t%")
+                        getPriceReportArr.add("$percentChangeIn30d\t%")
+                        getPriceReportArr.add("$percentChangeIn1y\t%")
+                        getPriceReportArr.add("$\t${toFixDecimalHelper(allTimeHighPrice)}")
+                        getPriceReportArr.add(StringUtil.dateToReadableString(allTimeDate))
+                        getPriceReportArr.add("$percentFromAth\t%")
+
+
                         CompositionLocalProvider(LocalImageLoader provides imageLoader) {
                            val painter = rememberImagePainter(dataState.logo)
-
                            Image(
                               painter = painter,
                               contentDescription = "SVG image",
                               contentScale = ContentScale.FillBounds,
-                              modifier = Modifier
-                                 .padding(start = 8.dp, end = 8.dp, top = 16.dp)
-                                 .size(46.dp)
-                                 .clip(CircleShape)
-                                 .constrainAs(textTitle) {
-                                    top.linkTo(parent.top)
-                                    start.linkTo(parent.start)
-                                    end.linkTo(parent.end)
-                                 }
+                              modifier = imgCoinIconModifier
                            )
                         }
+
+                        Text(
+                           text = "$${toFixDecimalHelper(coinPrice)}",
+                           fontSize = 18.sp,
+                           color = Color.LightGray,
+                           fontWeight = FontWeight.SemiBold,
+                           modifier = coinPriceModifier
+                        )
+
+                        Row(
+                           horizontalArrangement = Arrangement.SpaceAround,
+                           modifier = rowButtonModifier
+                        ) {
+                           IconButton(
+                              onClick = {
+                                 println("buy")
+                              }, modifier = Modifier
+                                 .background(Color.Green)
+                                 .weight(.3f)
+                           ) {
+                              Row {
+                                 Icon(
+                                    painter = painterResource(id = R.drawable.ic_buy),
+                                    contentDescription = "Icon buy"
+                                 )
+                                 Text(text = "Buy", fontSize = 16.sp, color = Color.White)
+                              }
+                           }
+
+                           IconButton(
+                              onClick = {
+                                 println("sell")
+                              }, modifier = Modifier
+                                 .background(Color.Red)
+                                 .weight(.3f)
+                           ) {
+                              Row {
+                                 Icon(
+                                    painter = painterResource(id = R.drawable.ic_sell),
+                                    contentDescription = "Icon Sell"
+                                 )
+                                 Text(text = "Sell", fontSize = 16.sp, color = Color.White)
+                              }
+                           }
+                        }
+
+                        Text(text = "coin price report", modifier = textCoinPriceReportModifier)
+
+                        Column(modifier = containerPriceTickerModifier) {
+
+                           tablePriceDataClass.forEachIndexed { index, it ->
+                              Row(
+                                 modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 2.dp)
+                              ) {
+                                 Text(
+                                    fontSize = 18.sp,
+                                    text = it.columnName,
+                                    textAlign = TextAlign.Start,
+                                    color = mPrimary,
+                                    modifier = Modifier.weight(.5f)
+                                 )
+                                 Text(
+                                    fontSize = 18.sp,
+                                    textAlign = TextAlign.End,
+                                    text = getPriceReportArr[index],
+                                    color = Color.LightGray,
+                                    modifier = Modifier.weight(.5f)
+                                 )
+                              }
+                           }
+                        }
+
                      } else println("Loading...")
 
                   }

@@ -1,4 +1,4 @@
-package com.aaronfabian.applejuice.utils
+package com.aaronfabian.applejuice.utils.dataClass
 
 data class NavbarDataClass(
    val miniText: String,

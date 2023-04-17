@@ -1,4 +1,4 @@
-package com.aaronfabian.applejuice.utils
+package com.aaronfabian.applejuice.utils.dataClass
 
 import com.aaronfabian.applejuice.R
 import com.aaronfabian.applejuice.presentation.Screen

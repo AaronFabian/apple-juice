@@ -70,7 +70,7 @@ fun PeopleDetailScreen(
       }
 
       Divider(
-         thickness = .8.dp,
+         thickness = .2.dp,
          color = Color.LightGray,
          modifier = Modifier
             .fillMaxWidth()

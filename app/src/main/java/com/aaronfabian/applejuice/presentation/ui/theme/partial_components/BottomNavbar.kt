@@ -1,7 +1,6 @@
 package com.aaronfabian.applejuice.presentation.ui.theme.partial_components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -14,7 +13,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.aaronfabian.applejuice.presentation.Screen
-import com.aaronfabian.applejuice.utils.NavbarHelperData
+import com.aaronfabian.applejuice.utils.dataClass.NavbarHelperData
 
 @Composable
 fun BottomNavbar(navController: NavController) {
@@ -23,7 +22,6 @@ fun BottomNavbar(navController: NavController) {
       mutableStateOf(Screen.HomeScreen.route)
    }
 
-   Divider(thickness = .5.dp, color = Color.LightGray)
    ConstraintLayout(
       modifier = Modifier
          .offset(y = (-2).dp)
