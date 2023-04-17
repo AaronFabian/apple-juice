@@ -26,6 +26,7 @@ import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
 import com.aaronfabian.applejuice.R
 import com.aaronfabian.applejuice.domain.model.CoinDetail
+import com.aaronfabian.applejuice.domain.model.CoinTicker
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.Overview
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.Related
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.VerticalDivider
@@ -41,9 +42,10 @@ fun CoinDetailScreen(
 ) {
 
    val state = viewModel.state.value
+   val state2 = viewModel.state2.value
 
    if (state.coin != null) {
-      CoinDetailScreenContent(state.coin, navController)
+      CoinDetailScreenContent(state.coin, state2.coin, navController)
    }
 
 
@@ -70,6 +72,7 @@ fun CoinDetailScreen(
 @Composable
 fun CoinDetailScreenContent(
    dataState: CoinDetail,
+   dataStateTicker: CoinTicker?,
    navController: NavController,
 ) {
 
@@ -246,11 +249,13 @@ fun CoinDetailScreenContent(
                         fontWeight = FontWeight.Thin,
                         color = mTextPrimary
                      )
+
+                     val statusActive = dataState.is_active == true
                      Text(
                         fontSize = 16.sp,
-                        text = "Yes",
+                        text = if (statusActive) "Yes" else "No",
                         fontWeight = FontWeight.Normal,
-                        color = mTextPrimary
+                        color = if (statusActive) Color.Green else Color.Red
                      )
                   }
                }
@@ -382,24 +387,27 @@ fun CoinDetailScreenContent(
                         add(SvgDecoder(LocalContext.current))
                      }.build()
 
-                     CompositionLocalProvider(LocalImageLoader provides imageLoader) {
-                        val painter = rememberImagePainter(dataState.logo)
+                     if (dataStateTicker != null) {
+                        CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+                           val painter = rememberImagePainter(dataState.logo)
 
-                        Image(
-                           painter = painter,
-                           contentDescription = "SVG image",
-                           contentScale = ContentScale.FillBounds,
-                           modifier = Modifier
-                              .padding(start = 8.dp, end = 8.dp, top = 16.dp)
-                              .size(46.dp)
-                              .clip(CircleShape)
-                              .constrainAs(textTitle) {
-                                 top.linkTo(parent.top)
-                                 start.linkTo(parent.start)
-                                 end.linkTo(parent.end)
-                              }
-                        )
-                     }
+                           Image(
+                              painter = painter,
+                              contentDescription = "SVG image",
+                              contentScale = ContentScale.FillBounds,
+                              modifier = Modifier
+                                 .padding(start = 8.dp, end = 8.dp, top = 16.dp)
+                                 .size(46.dp)
+                                 .clip(CircleShape)
+                                 .constrainAs(textTitle) {
+                                    top.linkTo(parent.top)
+                                    start.linkTo(parent.start)
+                                    end.linkTo(parent.end)
+                                 }
+                           )
+                        }
+                     } else println("Loading...")
+
                   }
                   "overview" -> {
 

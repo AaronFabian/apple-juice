@@ -6,7 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aaronfabian.applejuice.domain.use_case.GetDetailCoinUseCase
-import com.aaronfabian.applejuice.utils.Resource
+import com.aaronfabian.applejuice.utils.ResourceDoubleHtpp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -19,7 +19,9 @@ class CoinDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
    private val _state = mutableStateOf(CoinDetailState())
+   private val _state2 = mutableStateOf(CoinTickerState())
    val state: State<CoinDetailState> = _state
+   val state2: State<CoinTickerState> = _state2
 
    init {
       savedStateHandle.get<String>("coinId")?.let { coinId -> getCoin(coinId) }
@@ -29,16 +31,18 @@ class CoinDetailViewModel @Inject constructor(
 
       getCoinUseCase(coinId).onEach { result ->
          when (result) {
-            is Resource.Success -> {
+            is ResourceDoubleHtpp.Success -> {
                _state.value = CoinDetailState(coin = result.data)
+               _state2.value = CoinTickerState(coin = result.data2)
             }
-            is Resource.Error -> {
+            is ResourceDoubleHtpp.Error -> {
                _state.value = CoinDetailState(
                   error = result.message ?: "An unexpected error occurred"
                )
             }
-            is Resource.Loading -> {
+            is ResourceDoubleHtpp.Loading -> {
                _state.value = CoinDetailState(isLoading = true)
+               _state2.value = CoinTickerState(isLoading = true)
             }
          }
       }.launchIn(viewModelScope)
