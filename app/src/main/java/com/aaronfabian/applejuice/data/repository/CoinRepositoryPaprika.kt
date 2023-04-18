@@ -13,4 +13,5 @@ interface CoinRepositoryPaprika {
    suspend fun getCoinTickerById(coinId: String): CoinTickerDto
 
    suspend fun getCoinTagById(tagId: String): CoinTagDetailDto
+
 }

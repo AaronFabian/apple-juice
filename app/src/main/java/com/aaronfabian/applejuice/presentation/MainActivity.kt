@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.CoinDetailScreen
 import com.aaronfabian.applejuice.presentation.home_screen.HomeScreen
 import com.aaronfabian.applejuice.presentation.people_detail_screen.PeopleDetailScreen
+import com.aaronfabian.applejuice.presentation.search_screen.SearchScreen
 import com.aaronfabian.applejuice.presentation.tag_detail_screen.TagDetailScreen
 import com.aaronfabian.applejuice.presentation.ui.theme.AppleJuiceTheme
 import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.BottomNavbar
@@ -50,6 +51,10 @@ class MainActivity : ComponentActivity() {
 
                   composable(route = Screen.TagDetailScreen.route + "/{tagId}") {
                      TagDetailScreen(navController = navController)
+                  }
+
+                  composable(route = Screen.SearchCoinScreen.route + "/{query}") {
+                     SearchScreen(navController = navController)
                   }
 
                   composable(route = Screen.AccountProfileScreen.route) {

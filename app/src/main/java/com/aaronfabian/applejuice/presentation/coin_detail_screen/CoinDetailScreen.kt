@@ -98,6 +98,7 @@ fun CoinDetailScreenContent(
          SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(parsedTime)
    }
 
+
    Column(modifier = Modifier.fillMaxWidth()) {
       ConstraintLayout(
          modifier = Modifier

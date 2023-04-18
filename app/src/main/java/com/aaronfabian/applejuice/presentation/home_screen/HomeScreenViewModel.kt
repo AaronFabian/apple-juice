@@ -4,6 +4,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aaronfabian.applejuice.data.remote.dto.Data
+import com.aaronfabian.applejuice.data.remote.dto.Stats
+import com.aaronfabian.applejuice.domain.model.CoinList
 import com.aaronfabian.applejuice.domain.use_case.GetAllCoinsUseCase
 import com.aaronfabian.applejuice.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +30,8 @@ class HomeScreenViewModel @Inject constructor(
 
          when (response) {
             is Resource.Success -> {
+               i = response.data?.data?.coins?.size!!
+               lastCoinName = response.data.data.coins[i - 1].name
                this._state.value = HomeScreenState(coin = response.data)
             }
             is Resource.Error -> {
@@ -40,22 +45,55 @@ class HomeScreenViewModel @Inject constructor(
       }.launchIn(viewModelScope)
    }
 
-   private val _stateAgain = mutableStateOf(HomeScreenState())
-   val stateAgain: State<HomeScreenState> = _stateAgain
+   private val _stateNext = mutableStateOf(HomeScreenState())
+   val stateNext: State<HomeScreenState> = _stateNext
 
-   fun getCoinAgain() {
-      getAllCoinsUseCase().onEach { response ->
+   var lastCoinName: String? = ""
+   private var page: Int = 0
+   private var i = 0
+   private var preventRequest = false
+
+   fun getCoinNextList() {
+
+      if (preventRequest) return
+
+      page++
+      getAllCoinsUseCase.getCoinNextList((page * 100).toString()).onEach { response ->
 
          when (response) {
             is Resource.Success -> {
-               this._stateAgain.value = HomeScreenState(coin = response.data)
+               this._stateNext.value = HomeScreenState(coin = response.data) // del soon
+               val prevState = _state.value.coin?.data?.coins
+               prevState?.addAll(response.data?.data?.coins!!)!!
+
+               val coinList = CoinList(
+                  data = Data(
+                     prevState,
+                     stats = Stats(
+                        total = 0,
+                        total24hVolume = "",
+                        totalCoins = 0,
+                        totalExchanges = 0,
+                        totalMarketCap = "",
+                        totalMarkets = 0
+                     )
+                  ), status = ""
+               )
+
+               i = prevState.size
+               lastCoinName = prevState[i - 1].name
+               preventRequest = false
+               this._state.value = HomeScreenState(coin = coinList)
             }
             is Resource.Error -> {
-               this._stateAgain.value =
-                  HomeScreenState(error = response.message ?: "An unexpected error occurred 32")
+               this._stateNext.value =
+                  HomeScreenState(error = response.message ?: "An unexpected error occurred")
+               preventRequest = false
+               page--
             }
             is Resource.Loading -> {
-               this._stateAgain.value = HomeScreenState(isLoading = true)
+               this._stateNext.value = HomeScreenState(isLoading = true)
+               preventRequest = true
             }
          }
       }.launchIn(viewModelScope)

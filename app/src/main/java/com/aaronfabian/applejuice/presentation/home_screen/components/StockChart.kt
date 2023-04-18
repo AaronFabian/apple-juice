@@ -12,13 +12,13 @@ import kotlin.math.absoluteValue
 @Composable
 fun StockChart(
    changeColor: Float,
-   infos: List<String> = emptyList(),
+   infos: List<String?> = emptyList(),
    modifier: Modifier = Modifier,
 ) {
 
    val sortedFloatSparkLine = infos
       .asSequence()
-      .mapNotNull { it.toFloatOrNull() }
+      .mapNotNull { it?.toFloat() ?: 0f }
       .sortedDescending()
       .toList()
 
@@ -34,15 +34,17 @@ fun StockChart(
       var x1 = 0f
       var x2 = 0f
       infos.forEachIndexed { index, _ ->
+
          val sparkValue = sortedFloatSparkLine[index]
          val tolerance = 0.001 // Specify a tolerance level for floating-point comparisons
          val sparkPositionIndex = infos.indexOfFirst {
-            (it.toDoubleOrNull()?.minus(sparkValue)?.absoluteValue ?: Double.MAX_VALUE) <= tolerance
+            (it?.toDoubleOrNull()?.minus(sparkValue)?.absoluteValue
+               ?: Double.MAX_VALUE) <= tolerance
          }
 
          val sparkValueNext = sortedFloatSparkLine.getOrNull(index + 1)
          val sparkPositionIndexNext = infos.indexOfFirst {
-            (it.toDoubleOrNull()
+            (it?.toDoubleOrNull()
                ?.minus(sparkValueNext ?: sparkValue)?.absoluteValue
                ?: Double.MAX_VALUE) <= tolerance
          }

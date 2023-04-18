@@ -26,6 +26,7 @@ class CoinRepositoryPaprikaImpl @Inject constructor(
    override suspend fun getCoinTagById(tagId: String): CoinTagDetailDto {
       return paprikaApi.getTagDetailById(tagId)
    }
+   
 }
 
 //    normal way to call api

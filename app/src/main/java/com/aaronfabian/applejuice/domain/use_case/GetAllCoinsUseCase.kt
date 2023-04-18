@@ -21,10 +21,30 @@ class GetAllCoinsUseCase @Inject constructor(
             val fetchedData = repository.getAllCoins().toCoinListModel()
             emit(Resource.Success<CoinList>(fetchedData))
          } catch (e: HttpException) {
-            emit(Resource.Error<CoinList>(message = e.localizedMessage ?: "An unexpected error occurred !"))
+            emit(
+               Resource.Error<CoinList>(
+                  message = e.localizedMessage ?: "An unexpected error occurred !"
+               )
+            )
          } catch (e: IOException) {
             emit(Resource.Error<CoinList>(message = "Could not reach the server please check your internet connection !"))
          }
+      }
+   }
+
+   fun getCoinNextList(offset: String): Flow<Resource<CoinList>> = flow {
+      try {
+         emit(Resource.Loading())
+         val fetchedData = repository.getCoinNextList(offset).toCoinListModel()
+         emit(Resource.Success<CoinList>(fetchedData))
+      } catch (e: HttpException) {
+         emit(
+            Resource.Error<CoinList>(
+               message = e.localizedMessage ?: "An unexpected error while fetch next page"
+            )
+         )
+      } catch (e: IOException) {
+         emit(Resource.Error<CoinList>(message = "Could not reach the server please check your internet connection !"))
       }
    }
 }

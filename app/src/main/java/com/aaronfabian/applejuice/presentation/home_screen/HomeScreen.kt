@@ -28,6 +28,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aaronfabian.applejuice.R
+import com.aaronfabian.applejuice.presentation.Screen
 import com.aaronfabian.applejuice.presentation.home_screen.components.CoinItem
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
 import com.aaronfabian.applejuice.presentation.ui.theme.mTextPrimary
@@ -40,10 +41,12 @@ fun HomeScreen(
 ) {
 
    val state = viewModel.state.value
+   val stateNext = viewModel.stateNext.value
 
    var tfSearchState by remember {
       mutableStateOf("")
    }
+
    val listState = rememberLazyListState()
    val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -92,8 +95,10 @@ fun HomeScreen(
                   ),
                keyboardActions = KeyboardActions(onDone = {
 
+                  if (tfSearchState.isEmpty()) return@KeyboardActions
+
                   keyboardController?.hide()
-                  println(tfSearchState)
+                  navController.navigate(Screen.SearchCoinScreen.route + "/${tfSearchState}")
                })
             )
             IconButton(onClick = { }) {
@@ -142,7 +147,7 @@ fun HomeScreen(
                      modifier = Modifier
                         .background(Color(0xFF0052FF))
                         .width(40.dp)
-                        .height(6.dp)
+                        .height(4.dp)
                   )
                }
             }
@@ -239,33 +244,76 @@ fun HomeScreen(
                   top.linkTo(filterBtn.bottom)
                   start.linkTo(parent.start)
                }) {
+
                items(state.coin.data.coins) { coin ->
                   CoinItem(coin, navController)
+
+                  if (coin.name == viewModel.lastCoinName) {
+
+                     viewModel.getCoinNextList()
+                  }
+
+                  println("${coin.name} -> ${viewModel.lastCoinName}")
                }
-            }
 
+
+               if (stateNext.isLoading) {
+                  item {
+                     Row(
+                        modifier = Modifier
+                           .fillMaxWidth()
+                           .padding(8.dp),
+                        horizontalArrangement = Arrangement.Center
+                     ) {
+                        CircularProgressIndicator()
+                     }
+                  }
+               }
+
+               if (stateNext.coin?.data?.coins != null) {
+
+               }
+
+               if (stateNext.error.isNotBlank()) {
+
+                  item {
+                     Row(
+                        modifier = Modifier
+                           .fillMaxWidth()
+                           .padding(8.dp),
+                        horizontalArrangement = Arrangement.Center
+                     ) {
+                        Text(text = "Fetching please wait")
+                     }
+                  }
+               }
+
+            }
          }
 
-         if (state.error.isNotBlank()) {
-            Box(modifier = Modifier.fillMaxSize()) {
-               Text(
-                  text = state.error,
-                  color = MaterialTheme.colors.error,
-                  textAlign = TextAlign.Center,
-                  modifier = Modifier
-                     .fillMaxWidth()
-                     .padding(horizontal = 20.dp)
-               )
-            }
-         }
+      }
 
-         if (state.isLoading) {
-            Box(modifier = Modifier.fillMaxSize()) {
-               CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
+      if (state.error.isNotBlank()) {
+         Box(modifier = Modifier.fillMaxSize()) {
+            Text(
+               text = state.error,
+               color = MaterialTheme.colors.error,
+               textAlign = TextAlign.Center,
+               modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(horizontal = 20.dp)
+            )
+         }
+      }
+
+      if (state.isLoading) {
+         Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
          }
       }
    }
+
+
 }
 
 

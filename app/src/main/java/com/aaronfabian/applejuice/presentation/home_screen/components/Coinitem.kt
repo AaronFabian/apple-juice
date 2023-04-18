@@ -29,12 +29,12 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
             val getCoinSymbol = coinInfo.symbol
             val getCoinName = coinInfo.name
 
-            strCoinId.append(getCoinSymbol.toLowerCase())
+            strCoinId.append(getCoinSymbol?.toLowerCase())
             strCoinId.append('-')
             strCoinId.append(
                getCoinName
-                  .toLowerCase()
-                  .replace(' ', '-')
+                  ?.toLowerCase()
+                  ?.replace(' ', '-')
             )
 
             println(strCoinId)
@@ -44,15 +44,15 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
          .height(80.dp)
          .fillMaxWidth()
    ) {
-      LoadSVGImageIcon(url = coinInfo.iconUrl)
+      LoadSVGImageIcon(url = coinInfo.iconUrl ?: "")
 
       Column(
          modifier = Modifier
-            .weight(1f)
+            .weight(1.2f)
             .fillMaxHeight()
       ) {
          Text(
-            text = coinInfo.symbol,
+            text = coinInfo.symbol ?: "Er",
             fontSize = 18.sp,
             color = mTextPrimary,
             fontWeight = FontWeight.Bold,
@@ -60,7 +60,7 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
          )
 
          Text(
-            text = coinInfo.name,
+            text = coinInfo.name ?: "Er",
             fontSize = 12.sp,
             color = Color.LightGray,
             modifier = Modifier.padding(start = 4.dp)
@@ -72,7 +72,10 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
             .weight(1.5f)
             .height(54.dp)
       ) {
-         StockChart(infos = coinInfo.sparkline, changeColor = coinInfo.change.toFloat())
+         StockChart(
+            infos = coinInfo.sparkline ?: emptyList(),
+            changeColor = coinInfo.change?.toFloat() ?: 0f
+         )
       }
 
       Column(
@@ -83,6 +86,8 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
             .fillMaxHeight()
       ) {
 
+         var price = coinInfo.price
+
          Text(
             text = "$${BigDecimal(coinInfo.price).setScale(2, RoundingMode.HALF_EVEN)}",
             color = mTextPrimary,
@@ -90,8 +95,8 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
             fontSize = 20.sp
          )
          Text(
-            text = coinInfo.change + "%",
-            color = Color(if (coinInfo.change.toFloat() > 0) 0xFFC1EAD2 else 0xFFF5ABAB),
+            text = (coinInfo.change) + "%",
+            color = Color(if ((coinInfo.change?.toFloat() ?: 0f) > 0) 0xFFC1EAD2 else 0xFFF5ABAB),
             fontSize = 12.sp
          )
       }

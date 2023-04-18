@@ -2,6 +2,8 @@ package com.aaronfabian.applejuice.utils
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -15,5 +17,9 @@ object StringUtil {
       val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
 
       return formatter.format(localDateTime)
+   }
+
+   fun toFixDecimal(number: String): String {
+      return "${BigDecimal(number).setScale(4, RoundingMode.HALF_EVEN)}"
    }
 }
