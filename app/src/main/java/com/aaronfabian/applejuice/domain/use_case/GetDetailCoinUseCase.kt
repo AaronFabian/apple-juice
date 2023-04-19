@@ -9,7 +9,6 @@ import com.aaronfabian.applejuice.domain.model.CoinDetail
 import com.aaronfabian.applejuice.domain.model.CoinGraph
 import com.aaronfabian.applejuice.domain.model.CoinTicker
 import com.aaronfabian.applejuice.utils.Resource
-import com.aaronfabian.applejuice.utils.ResourceDoubleHtpp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -20,32 +19,48 @@ class GetDetailCoinUseCase @Inject constructor(
    private val repository: CoinRepositoryPaprika,
    private val repositoryRanking: CoinRepository
 ) {
-//   operator fun invoke(coinId: String): Flow<Resource<CoinDetail>> = flow {
+   fun getTickers(coinId: String): Flow<Resource<CoinTicker>> = flow {
+      try {
+         this.emit(Resource.Loading<CoinTicker>())
+         val coin = repository.getCoinTickerById(coinId).toCoinTickerModel()
+         emit(Resource.Success<CoinTicker>(coin))
+      } catch (e: HttpException) {
+         emit(Resource.Error<CoinTicker>(e.localizedMessage ?: "An unexpected error occurred"))
+      } catch (e: IOException) {
+         emit(Resource.Error<CoinTicker>("Couldn't reach server. Check your internet connection."))
+      }
+   }
+
+//   operator fun invoke(coinId: String): Flow<ResourceDoubleHtpp<CoinDetail, CoinTicker>> = flow {
 //      try {
-//         this.emit(Resource.Loading<CoinDetail>())
+//         this.emit(ResourceDoubleHtpp.Loading())
 //         val coin = repository.getCoinDetailById(coinId).toCoinDetailModel()
-//         emit(Resource.Success<CoinDetail>(coin))
+//         val ticker = repository.getCoinTickerById(coinId).toCoinTickerModel()
+//         emit(ResourceDoubleHtpp.Success<CoinDetail, CoinTicker>(coin, ticker))
 //      } catch (e: HttpException) {
-//         emit(Resource.Error<CoinDetail>(e.localizedMessage ?: "An unexpected error occurred"))
+//         emit(
+//            ResourceDoubleHtpp.Error<CoinDetail, CoinTicker>(
+//               e.localizedMessage ?: "An unexpected error occurred",
+//            )
+//         )
 //      } catch (e: IOException) {
-//         emit(Resource.Error<CoinDetail>("Couldn't reach server. Check your internet connection."))
+//         emit(ResourceDoubleHtpp.Error<CoinDetail, CoinTicker>("Couldn't reach server. Check your internet connection."))
 //      }
 //   }
 
-   operator fun invoke(coinId: String): Flow<ResourceDoubleHtpp<CoinDetail, CoinTicker>> = flow {
+   operator fun invoke(coinId: String): Flow<Resource<CoinDetail>> = flow {
       try {
-         this.emit(ResourceDoubleHtpp.Loading())
+         this.emit(Resource.Loading())
          val coin = repository.getCoinDetailById(coinId).toCoinDetailModel()
-         val ticker = repository.getCoinTickerById(coinId).toCoinTickerModel()
-         emit(ResourceDoubleHtpp.Success<CoinDetail, CoinTicker>(coin, ticker))
+         emit(Resource.Success<CoinDetail>(coin))
       } catch (e: HttpException) {
          emit(
-            ResourceDoubleHtpp.Error<CoinDetail, CoinTicker>(
+            Resource.Error<CoinDetail>(
                e.localizedMessage ?: "An unexpected error occurred",
             )
          )
       } catch (e: IOException) {
-         emit(ResourceDoubleHtpp.Error<CoinDetail, CoinTicker>("Couldn't reach server. Check your internet connection."))
+         emit(Resource.Error<CoinDetail>("Couldn't reach server. Check your internet connection."))
       }
    }
 

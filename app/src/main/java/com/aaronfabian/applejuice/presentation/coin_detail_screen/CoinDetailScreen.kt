@@ -28,7 +28,6 @@ import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
 import com.aaronfabian.applejuice.R
 import com.aaronfabian.applejuice.domain.model.CoinDetail
-import com.aaronfabian.applejuice.domain.model.CoinTicker
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.CoinDetailCanvas
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.Overview
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.Related
@@ -54,7 +53,7 @@ fun CoinDetailScreen(
    val state3 = viewModel.state3.value
 
    if (state.coin != null) {
-      CoinDetailScreenContent(state.coin, state2.coin, state3, navController)
+      CoinDetailScreenContent(state.coin, state2, state3, navController)
    }
 
 
@@ -82,7 +81,7 @@ fun CoinDetailScreen(
 @Composable
 fun CoinDetailScreenContent(
    dataState: CoinDetail,
-   dataStateTicker: CoinTicker?,
+   _dataStateTicker: CoinTickerState,
    _coinGraphState: CoinGraphState,
    navController: NavController,
 ) {
@@ -185,15 +184,34 @@ fun CoinDetailScreenContent(
             }
 
             if (_coinGraphState.error.isNotBlank()) {
-               Box(modifier = Modifier.fillMaxSize()) {
-                  Text(
-                     text = _coinGraphState.error,
-                     color = MaterialTheme.colors.error,
-                     textAlign = TextAlign.Center,
+               val responseCode = _coinGraphState.error.split(' ')[1]
+
+               if (responseCode == "429") {
+                  Box(
                      modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                  )
+                        .fillMaxSize()
+                        .background(color = MaterialTheme.colors.onError)
+                  ) {
+                     Text(
+                        text = "can't display chart for the moment.",
+                        color = MaterialTheme.colors.error,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                           .fillMaxWidth()
+                           .padding(horizontal = 20.dp)
+                     )
+                  }
+               } else {
+                  Box(modifier = Modifier.fillMaxSize()) {
+                     Text(
+                        text = _coinGraphState.error,
+                        color = MaterialTheme.colors.error,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                           .fillMaxWidth()
+                           .padding(horizontal = 20.dp)
+                     )
+                  }
                }
             }
 
@@ -203,6 +221,7 @@ fun CoinDetailScreenContent(
                   modifier = Modifier
                      .background(MaterialTheme.colors.onError)
                      .fillMaxSize()
+                     .padding(end = 8.dp)
                )
             }
 
@@ -479,7 +498,10 @@ fun CoinDetailScreenContent(
                         .componentRegistry { add(SvgDecoder(LocalContext.current)) }
                         .build()
 
-                     if (dataStateTicker != null) {
+                     if (_dataStateTicker.coin != null) {
+
+                        val tickerData = _dataStateTicker.coin
+
                         val toFixDecimalHelper = { price: Double ->
                            BigDecimal(price)
                               .setScale(
@@ -491,24 +513,23 @@ fun CoinDetailScreenContent(
                         val tablePriceDataClass = TablePriceHelperData.getTableData()
                         val getPriceReportArr = ArrayList<String>()
 
-                        val coinPrice = dataStateTicker.quotes.USD.price // not include in array
-                        val volumeIn24h = dataStateTicker.quotes.USD.volume_24h
-                        val volumeChangeIn24h = dataStateTicker.quotes.USD.volume_24h_change_24h
-                        val marketCap = dataStateTicker.quotes.USD.market_cap.toDouble()
-                        val marketCapChangeIn24h = dataStateTicker.quotes.USD.market_cap_change_24h
-                        val percentChangeIn15m = dataStateTicker.quotes.USD.percent_change_15m
-                        val percentChangeIn30m = dataStateTicker.quotes.USD.percent_change_30m
-                        val percentChangeIn1h = dataStateTicker.quotes.USD.percent_change_1h
-                        val percentChangeIn6h = dataStateTicker.quotes.USD.percent_change_6h
-                        val percentChangeIn12h = dataStateTicker.quotes.USD.percent_change_12h
-                        val percentChangeIn24h = dataStateTicker.quotes.USD.percent_change_24h
-                        val percentChangeIn7d = dataStateTicker.quotes.USD.percent_change_7d
-                        val percentChangeIn30d = dataStateTicker.quotes.USD.percent_change_30d
-                        val percentChangeIn1y = dataStateTicker.quotes.USD.percent_change_1y
-                        val allTimeHighPrice = dataStateTicker.quotes.USD.ath_price
-                        val allTimeDate = dataStateTicker.quotes.USD.ath_date
-                        val percentFromAth = dataStateTicker.quotes.USD.percent_from_price_ath
-
+                        val coinPrice = tickerData.quotes.USD.price // not include in array
+                        val volumeIn24h = tickerData.quotes.USD.volume_24h
+                        val volumeChangeIn24h = tickerData.quotes.USD.volume_24h_change_24h
+                        val marketCap = tickerData.quotes.USD.market_cap.toDouble()
+                        val marketCapChangeIn24h = tickerData.quotes.USD.market_cap_change_24h
+                        val percentChangeIn15m = tickerData.quotes.USD.percent_change_15m
+                        val percentChangeIn30m = tickerData.quotes.USD.percent_change_30m
+                        val percentChangeIn1h = tickerData.quotes.USD.percent_change_1h
+                        val percentChangeIn6h = tickerData.quotes.USD.percent_change_6h
+                        val percentChangeIn12h = tickerData.quotes.USD.percent_change_12h
+                        val percentChangeIn24h = tickerData.quotes.USD.percent_change_24h
+                        val percentChangeIn7d = tickerData.quotes.USD.percent_change_7d
+                        val percentChangeIn30d = tickerData.quotes.USD.percent_change_30d
+                        val percentChangeIn1y = tickerData.quotes.USD.percent_change_1y
+                        val allTimeHighPrice = tickerData.quotes.USD.ath_price
+                        val allTimeDate = tickerData.quotes.USD.ath_date
+                        val percentFromAth = tickerData.quotes.USD.percent_from_price_ath
 
                         getPriceReportArr.add("$\t${toFixDecimalHelper(volumeIn24h)}")
                         getPriceReportArr.add("$volumeChangeIn24h")
@@ -610,8 +631,46 @@ fun CoinDetailScreenContent(
                               }
                            }
                         }
+                     }
 
-                     } else println("Loading...")
+                     if (_dataStateTicker.error.isNotBlank()) {
+
+                        val responseCodeTicker = _dataStateTicker.error.split(' ')[1]
+
+
+                        if (responseCodeTicker == "404") {
+                           Box(modifier = Modifier.fillMaxSize()) {
+                              Text(
+                                 text = "data is missing",
+                                 color = MaterialTheme.colors.error,
+                                 textAlign = TextAlign.Center,
+                                 modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp)
+                              )
+                           }
+                        } else {
+
+                           Box(modifier = Modifier.fillMaxSize()) {
+                              Text(
+                                 text = _dataStateTicker.error,
+                                 color = MaterialTheme.colors.error,
+                                 textAlign = TextAlign.Center,
+                                 modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp)
+                              )
+                           }
+
+                        }
+                     }
+
+                     if (_dataStateTicker.isLoading) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                           CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                        }
+                     }
+
 
                   }
                   "overview" -> {

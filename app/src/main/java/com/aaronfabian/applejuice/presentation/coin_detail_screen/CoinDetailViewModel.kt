@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aaronfabian.applejuice.domain.use_case.GetDetailCoinUseCase
 import com.aaronfabian.applejuice.utils.Resource
-import com.aaronfabian.applejuice.utils.ResourceDoubleHtpp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -29,6 +28,7 @@ class CoinDetailViewModel @Inject constructor(
 
    init {
       savedStateHandle.get<String>("coinId")?.let { coinId -> getCoin(coinId) }
+      savedStateHandle.get<String>("coinId")?.let { coinId -> getTickers(coinId) }
       savedStateHandle.get<String>("coinId")?.let { coinId -> getCoinGraph(coinId) }
    }
 
@@ -36,17 +36,34 @@ class CoinDetailViewModel @Inject constructor(
 
       getCoinUseCase(coinId).onEach { result ->
          when (result) {
-            is ResourceDoubleHtpp.Success -> {
+            is Resource.Success -> {
                _state.value = CoinDetailState(coin = result.data)
-               _state2.value = CoinTickerState(coin = result.data2)
             }
-            is ResourceDoubleHtpp.Error -> {
+            is Resource.Error -> {
                _state.value = CoinDetailState(
                   error = result.message ?: "An unexpected error occurred"
                )
             }
-            is ResourceDoubleHtpp.Loading -> {
+            is Resource.Loading -> {
                _state.value = CoinDetailState(isLoading = true)
+            }
+         }
+      }.launchIn(viewModelScope)
+   }
+
+   private fun getTickers(coinId: String) {
+
+      getCoinUseCase.getTickers(coinId).onEach { result ->
+         when (result) {
+            is Resource.Success -> {
+               _state2.value = CoinTickerState(coin = result.data)
+            }
+            is Resource.Error -> {
+               _state2.value = CoinTickerState(
+                  error = result.message ?: "An unexpected error occurred"
+               )
+            }
+            is Resource.Loading -> {
                _state2.value = CoinTickerState(isLoading = true)
             }
          }
