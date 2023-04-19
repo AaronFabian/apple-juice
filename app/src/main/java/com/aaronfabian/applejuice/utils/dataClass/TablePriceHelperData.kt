@@ -21,6 +21,9 @@ object TablePriceHelperData {
       tablePriceDataClassArr.add(TablePriceDataClass("All time high price"))
       tablePriceDataClassArr.add(TablePriceDataClass("All time date"))
       tablePriceDataClassArr.add(TablePriceDataClass("Percent from ath"))
+      tablePriceDataClassArr.add(TablePriceDataClass("Total supply"))
+      tablePriceDataClassArr.add(TablePriceDataClass("Max supply"))
+      tablePriceDataClassArr.add(TablePriceDataClass("Circulating coin"))
 
       return tablePriceDataClassArr
    }

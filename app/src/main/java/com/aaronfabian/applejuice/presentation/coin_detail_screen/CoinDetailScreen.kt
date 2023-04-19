@@ -52,8 +52,18 @@ fun CoinDetailScreen(
    val state2 = viewModel.state2.value
    val state3 = viewModel.state3.value
 
-   if (state.coin != null) {
-      CoinDetailScreenContent(state.coin, state2, state3, navController)
+   var allow by remember {
+      mutableStateOf(false)
+   }
+
+   LaunchedEffect(key1 = state, key2 = state2, key3 = state3) {
+      if (state.coin != null) {
+         allow = true
+      }
+   }
+   
+   if (allow) {
+      CoinDetailScreenContent(state.coin!!, state2, state3, navController)
    }
 
 
@@ -530,6 +540,9 @@ fun CoinDetailScreenContent(
                         val allTimeHighPrice = tickerData.quotes.USD.ath_price
                         val allTimeDate = tickerData.quotes.USD.ath_date
                         val percentFromAth = tickerData.quotes.USD.percent_from_price_ath
+                        val totalSupply = tickerData.total_supply
+                        val maxSupply = tickerData.max_supply
+                        val circulatingCoin = tickerData.circulating_supply
 
                         getPriceReportArr.add("$\t${toFixDecimalHelper(volumeIn24h)}")
                         getPriceReportArr.add("$volumeChangeIn24h")
@@ -547,6 +560,9 @@ fun CoinDetailScreenContent(
                         getPriceReportArr.add("$\t${toFixDecimalHelper(allTimeHighPrice)}")
                         getPriceReportArr.add(StringUtil.dateToReadableString(allTimeDate))
                         getPriceReportArr.add("$percentFromAth\t%")
+                        getPriceReportArr.add("$totalSupply")
+                        getPriceReportArr.add("$maxSupply")
+                        getPriceReportArr.add("$circulatingCoin")
 
 
                         CompositionLocalProvider(LocalImageLoader provides imageLoader) {
