@@ -10,6 +10,7 @@ import com.aaronfabian.applejuice.domain.model.CoinList
 import com.aaronfabian.applejuice.domain.use_case.GetAllCoinsUseCase
 import com.aaronfabian.applejuice.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -86,6 +87,12 @@ class HomeScreenViewModel @Inject constructor(
                this._state.value = HomeScreenState(coin = coinList)
             }
             is Resource.Error -> {
+
+               val responseCode = response.message?.split(' ')
+               if (responseCode != null && responseCode[1] == "429") {
+                  delay(5000) // prevent too many request error
+               }
+
                this._stateNext.value =
                   HomeScreenState(error = response.message ?: "An unexpected error occurred")
                preventRequest = false

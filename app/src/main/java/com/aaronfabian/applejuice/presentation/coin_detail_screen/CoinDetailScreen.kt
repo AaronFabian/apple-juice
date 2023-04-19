@@ -29,6 +29,7 @@ import coil.decode.SvgDecoder
 import com.aaronfabian.applejuice.R
 import com.aaronfabian.applejuice.domain.model.CoinDetail
 import com.aaronfabian.applejuice.domain.model.CoinTicker
+import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.CoinDetailCanvas
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.Overview
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.Related
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.components.VerticalDivider
@@ -50,9 +51,10 @@ fun CoinDetailScreen(
 
    val state = viewModel.state.value
    val state2 = viewModel.state2.value
+   val state3 = viewModel.state3.value
 
    if (state.coin != null) {
-      CoinDetailScreenContent(state.coin, state2.coin, navController)
+      CoinDetailScreenContent(state.coin, state2.coin, state3, navController)
    }
 
 
@@ -81,9 +83,9 @@ fun CoinDetailScreen(
 fun CoinDetailScreenContent(
    dataState: CoinDetail,
    dataStateTicker: CoinTicker?,
+   _coinGraphState: CoinGraphState,
    navController: NavController,
 ) {
-
    var coinDetailScreenState by remember {
       mutableStateOf("price")
    }
@@ -175,7 +177,35 @@ fun CoinDetailScreenContent(
                   top.linkTo(dividerRef.bottom)
                   start.linkTo(parent.start)
                }) {
-            Text(text = "Todo implement canvas", modifier = Modifier.align(Alignment.Center))
+
+            if (_coinGraphState.isLoading) {
+               Box(modifier = Modifier.fillMaxSize()) {
+                  CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+               }
+            }
+
+            if (_coinGraphState.error.isNotBlank()) {
+               Box(modifier = Modifier.fillMaxSize()) {
+                  Text(
+                     text = _coinGraphState.error,
+                     color = MaterialTheme.colors.error,
+                     textAlign = TextAlign.Center,
+                     modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                  )
+               }
+            }
+
+            if (_coinGraphState.coin != null) {
+               CoinDetailCanvas(
+                  _coinGraphState.coin,
+                  modifier = Modifier
+                     .background(MaterialTheme.colors.onError)
+                     .fillMaxSize()
+               )
+            }
+
          }
 
          // start middle card
@@ -478,6 +508,7 @@ fun CoinDetailScreenContent(
                         val allTimeHighPrice = dataStateTicker.quotes.USD.ath_price
                         val allTimeDate = dataStateTicker.quotes.USD.ath_date
                         val percentFromAth = dataStateTicker.quotes.USD.percent_from_price_ath
+
 
                         getPriceReportArr.add("$\t${toFixDecimalHelper(volumeIn24h)}")
                         getPriceReportArr.add("$volumeChangeIn24h")

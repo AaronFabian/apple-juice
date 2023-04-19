@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aaronfabian.applejuice.domain.use_case.GetDetailCoinUseCase
+import com.aaronfabian.applejuice.utils.Resource
 import com.aaronfabian.applejuice.utils.ResourceDoubleHtpp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -23,8 +24,12 @@ class CoinDetailViewModel @Inject constructor(
    val state: State<CoinDetailState> = _state
    val state2: State<CoinTickerState> = _state2
 
+   private val _state3 = mutableStateOf(CoinGraphState())
+   val state3: State<CoinGraphState> = _state3
+
    init {
       savedStateHandle.get<String>("coinId")?.let { coinId -> getCoin(coinId) }
+      savedStateHandle.get<String>("coinId")?.let { coinId -> getCoinGraph(coinId) }
    }
 
    private fun getCoin(coinId: String) {
@@ -44,6 +49,20 @@ class CoinDetailViewModel @Inject constructor(
                _state.value = CoinDetailState(isLoading = true)
                _state2.value = CoinTickerState(isLoading = true)
             }
+         }
+      }.launchIn(viewModelScope)
+   }
+
+   private fun getCoinGraph(coinId: String) {
+
+      val symbol = coinId.split('-').first()
+
+      getCoinUseCase.getGraph(symbol).onEach { response ->
+         when (response) {
+            is Resource.Loading -> _state3.value = CoinGraphState(isLoading = true)
+            is Resource.Success -> _state3.value = CoinGraphState(coin = response.data)
+            is Resource.Error -> _state3.value =
+               CoinGraphState(error = response.message ?: "An unexpected error occurred !")
          }
       }.launchIn(viewModelScope)
    }

@@ -2,6 +2,7 @@ package com.aaronfabian.applejuice.data.repository
 
 import com.aaronfabian.applejuice.data.remote.CoinRankingApi
 import com.aaronfabian.applejuice.data.remote.dto.CoinDto
+import com.aaronfabian.applejuice.data.remote.dto.CoinGraphDto
 import com.aaronfabian.applejuice.data.remote.dto.CoinSearchDto
 import javax.inject.Inject
 
@@ -20,5 +21,9 @@ class CoinRepositoryImpl @Inject constructor(
 
    override suspend fun getCoinBySearch(query: String): CoinSearchDto {
       return rankingApi.getCoinBySearch(query)
+   }
+
+   override suspend fun getCoinGraphBySymbol(symbols: String): CoinGraphDto {
+      return rankingApi.getCoinGraphBySymbol(symbols)
    }
 }

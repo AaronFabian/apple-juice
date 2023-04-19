@@ -1,6 +1,7 @@
 package com.aaronfabian.applejuice.data.repository
 
 import com.aaronfabian.applejuice.data.remote.dto.CoinDto
+import com.aaronfabian.applejuice.data.remote.dto.CoinGraphDto
 import com.aaronfabian.applejuice.data.remote.dto.CoinSearchDto
 
 interface CoinRepository {
@@ -9,4 +10,6 @@ interface CoinRepository {
    suspend fun getCoinNextList(offset: String): CoinDto
 
    suspend fun getCoinBySearch(query: String): CoinSearchDto
+
+   suspend fun getCoinGraphBySymbol(symbols: String): CoinGraphDto
 }
