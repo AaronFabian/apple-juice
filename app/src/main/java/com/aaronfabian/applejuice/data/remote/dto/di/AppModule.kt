@@ -2,11 +2,9 @@ package com.aaronfabian.applejuice.data.remote.dto.di
 
 import com.aaronfabian.applejuice.data.remote.CoinPaprikaApi
 import com.aaronfabian.applejuice.data.remote.CoinRankingApi
-import com.aaronfabian.applejuice.data.repository.CoinRepository
-import com.aaronfabian.applejuice.data.repository.CoinRepositoryImpl
-import com.aaronfabian.applejuice.data.repository.CoinRepositoryPaprika
-import com.aaronfabian.applejuice.data.repository.CoinRepositoryPaprikaImpl
+import com.aaronfabian.applejuice.data.repository.*
 import com.aaronfabian.applejuice.utils.Constants
+import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -53,4 +51,14 @@ object AppModule {
    fun provideCoinRepositoryPaprika(api: CoinPaprikaApi): CoinRepositoryPaprika {
       return CoinRepositoryPaprikaImpl(api)
    } // for GetDetailUseCase
+
+   @Provides
+   @Singleton
+   fun providesFirebaseAuth() = FirebaseAuth.getInstance()
+
+   @Provides
+   @Singleton
+   fun providesRepositoryImplementationImpl(firebaseAuth: FirebaseAuth): AuthRepository {
+      return AuthRepositoryImpl(firebaseAuth)
+   }
 }

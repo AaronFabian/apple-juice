@@ -57,11 +57,10 @@ fun CoinDetailScreen(
    }
 
    LaunchedEffect(key1 = state, key2 = state2, key3 = state3) {
-      if (state.coin != null) {
+      if (state.coin != null)
          allow = true
-      }
    }
-   
+
    if (allow) {
       CoinDetailScreenContent(state.coin!!, state2, state3, navController)
    }
@@ -98,6 +97,15 @@ fun CoinDetailScreenContent(
    var coinDetailScreenState by remember {
       mutableStateOf("price")
    }
+
+   var datastateTicker by remember {
+      mutableStateOf(false)
+   }
+
+   LaunchedEffect(key1 = _dataStateTicker) {
+      if (_dataStateTicker.coin != null) datastateTicker = true
+   }
+
 
    val inputTime = dataState.started_at
    var formattedTime = "--:--"
@@ -499,26 +507,35 @@ fun CoinDetailScreenContent(
 
                when (coinDetailScreenState) {
                   "price" -> {
-
-                     val modifierHashMap = HashMap<String, Modifier>()
-                     modifierHashMap["imgCoinIconModifier"] = imgCoinIconModifier
+                     val toFixDecimalHelper = { price: Double ->
+                        BigDecimal(price)
+                           .setScale(
+                              2,
+                              RoundingMode.HALF_EVEN
+                           )
+                     }
 
                      val imageLoader = ImageLoader
                         .Builder(LocalContext.current)
                         .componentRegistry { add(SvgDecoder(LocalContext.current)) }
                         .build()
 
-                     if (_dataStateTicker.coin != null) {
+                     CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+                        val painter = rememberImagePainter(dataState.logo)
+                        Image(
+                           painter = painter,
+                           contentDescription = "SVG image",
+                           contentScale = ContentScale.FillBounds,
+                           modifier = imgCoinIconModifier
+                        )
+                     }
 
-                        val tickerData = _dataStateTicker.coin
+                     val modifierHashMap = HashMap<String, Modifier>()
+                     modifierHashMap["imgCoinIconModifier"] = imgCoinIconModifier
 
-                        val toFixDecimalHelper = { price: Double ->
-                           BigDecimal(price)
-                              .setScale(
-                                 2,
-                                 RoundingMode.HALF_EVEN
-                              )
-                        }
+                     if (datastateTicker) {
+
+                        val tickerData = _dataStateTicker.coin!!
 
                         val tablePriceDataClass = TablePriceHelperData.getTableData()
                         val getPriceReportArr = ArrayList<String>()
@@ -563,17 +580,6 @@ fun CoinDetailScreenContent(
                         getPriceReportArr.add("$totalSupply")
                         getPriceReportArr.add("$maxSupply")
                         getPriceReportArr.add("$circulatingCoin")
-
-
-                        CompositionLocalProvider(LocalImageLoader provides imageLoader) {
-                           val painter = rememberImagePainter(dataState.logo)
-                           Image(
-                              painter = painter,
-                              contentDescription = "SVG image",
-                              contentScale = ContentScale.FillBounds,
-                              modifier = imgCoinIconModifier
-                           )
-                        }
 
                         Text(
                            text = "$${toFixDecimalHelper(coinPrice)}",
@@ -680,14 +686,6 @@ fun CoinDetailScreenContent(
 
                         }
                      }
-
-                     if (_dataStateTicker.isLoading) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                           CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                        }
-                     }
-
-
                   }
                   "overview" -> {
 
