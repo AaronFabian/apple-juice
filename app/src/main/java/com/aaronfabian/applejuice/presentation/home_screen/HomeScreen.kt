@@ -39,7 +39,6 @@ fun HomeScreen(
    navController: NavController,
    viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
-
    val state = viewModel.state.value
    val stateNext = viewModel.stateNext.value
 
@@ -59,7 +58,6 @@ fun HomeScreen(
          val filterBtn = createRef()
          val sortBtn = createRef()
          val containerCoinList = createRef()
-         val isLoadingState = createRef()
 
          Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -70,6 +68,7 @@ fun HomeScreen(
             TextField(
                onValueChange = { it -> tfSearchState = it },
                value = tfSearchState,
+               shape = RoundedCornerShape(8.dp),
                label = { Text(text = "Search Coin...", fontSize = 12.sp, color = mTextPrimary) },
                singleLine = true,
                leadingIcon = {
@@ -86,7 +85,6 @@ fun HomeScreen(
                   textColor = mTextPrimary,
                   cursorColor = mPrimary
                ),
-               shape = RoundedCornerShape(8.dp),
                modifier = Modifier
                   .weight(1f)
                   .border(
@@ -244,16 +242,13 @@ fun HomeScreen(
                   top.linkTo(filterBtn.bottom)
                   start.linkTo(parent.start)
                }) {
-
                items(state.coin.data.coins) { coin ->
                   CoinItem(coin, navController)
 
                   if (coin.name == viewModel.lastCoinName) {
-
                      viewModel.getCoinNextList()
                   }
-
-                  println("${coin.name} -> ${viewModel.lastCoinName}")
+                  // println("${coin.name} -> ${viewModel.lastCoinName}")
                }
 
 
@@ -287,7 +282,6 @@ fun HomeScreen(
                      }
                   }
                }
-
             }
          }
 

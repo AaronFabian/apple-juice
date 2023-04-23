@@ -183,8 +183,6 @@ fun SignUpScreen(
                }
             }
          }
-
-         println("tes")
       }
    }
 }

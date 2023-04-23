@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -12,15 +12,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
-import com.aaronfabian.applejuice.presentation.Screen
+import com.aaronfabian.applejuice.store.NavigationComposition
 import com.aaronfabian.applejuice.utils.dataClass.NavbarHelperData
 
 @Composable
 fun BottomNavbar(navController: NavController) {
 
-   var screenState by remember {
-      mutableStateOf(Screen.HomeScreen.route)
-   }
+   //   var screenState by remember {
+   //      mutableStateOf(Screen.HomeScreen.route)
+   //   }
+
+   val screenState = NavigationComposition.current.screen
+   println(screenState)
 
    ConstraintLayout(
       modifier = Modifier
@@ -82,9 +85,7 @@ fun BottomNavbar(navController: NavController) {
             contentDesc = it.contentDescription,
             isSelected = it.route == screenState,
             drawable = it.drawable
-         ) {
-            screenState = it.route
-         }
+         )
       }
    }
 }
@@ -98,11 +99,13 @@ fun NavbarIconBtn(
    contentDesc: String,
    isSelected: Boolean,
    drawable: Int,
-   fn: () -> Unit
+   // fn: () -> Unit
 ) {
+   val setScreenState = NavigationComposition.current.setScreen
+
    IconButton(
       onClick = {
-         fn()
+         setScreenState(route)
          navController.navigate(route)
       }, modifier = modifier
    ) {

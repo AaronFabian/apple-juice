@@ -36,11 +36,11 @@ fun SignInScreen(
    val state = viewModel.state.collectAsState(initial = null)
 
    Column(
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier
          .fillMaxSize()
          .padding(start = 30.dp, end = 30.dp),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally
    ) {
 
       Text(

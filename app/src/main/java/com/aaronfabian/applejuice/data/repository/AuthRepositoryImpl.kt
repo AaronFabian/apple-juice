@@ -10,11 +10,11 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-   private val firebaseAuth: FirebaseAuth
+   private val firebaseAuth: FirebaseAuth // no need getInstance() since it's injected
 ) : AuthRepository {
    override fun loginUser(email: String, password: String): Flow<Resource<AuthResult>> {
       return flow {
-         emit(Resource.Loading())
+         emit(Resource.Loading()) // this example no need addOnCompleteListener()
          val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
          emit(Resource.Success(result))
       }.catch {

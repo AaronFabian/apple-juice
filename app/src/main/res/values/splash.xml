@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#202020</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_logo_testsplash</item>
+        <item name="postSplashScreenTheme">@style/Theme.AppleJuice</item>
+    </style>
+</resources>

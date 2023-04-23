@@ -22,4 +22,18 @@ object StringUtil {
    fun toFixDecimal(number: String): String {
       return "${BigDecimal(number).setScale(4, RoundingMode.HALF_EVEN)}"
    }
+
+   fun toPaprikaID(coinName: String, coinSymbol: String): String {
+      val strCoinId = StringBuilder()
+
+      strCoinId.append(coinSymbol?.toLowerCase())
+      strCoinId.append('-')
+      strCoinId.append(
+         coinName
+            .toLowerCase()
+            .replace(' ', '-')
+      )
+
+      return strCoinId.toString()
+   }
 }
