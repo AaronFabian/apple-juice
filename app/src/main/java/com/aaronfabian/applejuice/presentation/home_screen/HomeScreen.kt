@@ -99,7 +99,9 @@ fun HomeScreen(
                   navController.navigate(Screen.SearchCoinScreen.route + "/${tfSearchState}")
                })
             )
-            IconButton(onClick = { }) {
+            IconButton(onClick = {
+               
+            }) {
                Icon(
                   tint = Color.Gray,
                   painter = painterResource(id = R.drawable.ic_ribbon),

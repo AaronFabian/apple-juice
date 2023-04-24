@@ -22,7 +22,10 @@ import com.aaronfabian.applejuice.presentation.sign_up.SignUpScreen
 import com.aaronfabian.applejuice.presentation.tag_detail_screen.TagDetailScreen
 import com.aaronfabian.applejuice.presentation.ui.theme.AppleJuiceTheme
 import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.BottomNavbar
+import com.aaronfabian.applejuice.store.NavigationComposition
 import com.aaronfabian.applejuice.store.NavigationCompositionProvider
+import com.aaronfabian.applejuice.utils.FirebaseClass
+import com.aaronfabian.applejuice.utils.User
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -88,7 +91,7 @@ class MainActivity : ComponentActivity() {
                      }
 
                      composable(route = Screen.AccountProfileScreen.route) {
-                        Text(text = "Account screen")
+                        AccountProfileScreen(navController = navController)
                      }
 
                      composable(route = Screen.MarketScreen.route) {
@@ -96,7 +99,12 @@ class MainActivity : ComponentActivity() {
                      }
 
                      composable(route = Screen.PortfolioScreen.route) {
+                        val cmp = NavigationComposition.current
+
                         Text(text = "Portfolio screen")
+                        cmp.setUser(User())
+                        cmp.setIsLoggedIn(false)
+                        FirebaseClass().signOutUser()
                      }
                   }
                }

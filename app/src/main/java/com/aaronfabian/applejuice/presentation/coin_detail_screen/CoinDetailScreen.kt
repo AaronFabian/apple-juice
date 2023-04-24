@@ -24,6 +24,7 @@ fun CoinDetailScreen(
    val state2 = viewModel.state2.value
    val state3 = viewModel.state3.value
 
+
    var allowCoinDetail by remember {
       mutableStateOf(false)
    }

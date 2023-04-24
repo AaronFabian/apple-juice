@@ -3,40 +3,71 @@ package com.aaronfabian.applejuice.presentation
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aaronfabian.applejuice.utils.Constants
+import com.aaronfabian.applejuice.utils.User
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class MainViewModel : ViewModel() {
 
    private val _isLoading = MutableStateFlow(true)
    val isLoading = _isLoading.asStateFlow()
 
-   var currentUserId = ""
+   var currentUserId = mutableStateOf("")
    var currentRoute = mutableStateOf(Screen.HomeScreen.route)
+
+   var user = mutableStateOf(User())
+   var isLoggedIn = mutableStateOf(false)
 
    init {
       viewModelScope.launch {
-         delay(3000)
-         checkIsSignIn()
+         delay(2500)
+         checkIsSignedIn()
       }
    }
 
-   private fun checkIsSignIn() {
+   private suspend fun checkIsSignedIn() {
       val currentUser = FirebaseAuth.getInstance().currentUser
+
+
       if (currentUser != null) {
-         currentUserId = currentUser.uid
-      }
-      if (currentUser == null) {
-         currentRoute.value = Screen.SignInScreen.route
+         try {
+            currentUserId.value = currentUser.uid
+            val userDocument = FirebaseFirestore
+               .getInstance()
+               .collection(Constants.USERS_COLLECTION)
+               .document(currentUser.uid)
+               .get()
+               .await()
+
+
+            val user = userDocument.toObject(User::class.java)!!
+
+            this.user.value = user
+            this.isLoggedIn.value = true
+         } catch (e: Exception) {
+            e.printStackTrace()
+            println("something wrong error at MainViewModel")
+         }
       }
 
       _isLoading.value = false
    }
 
    fun setRoute(route: String) {
-      currentRoute.value = route
+      this.currentRoute.value = route
+   }
+
+   fun setUser(user: User) {
+      this.user.value = user
+   }
+
+   fun setIsLoggedIn(isLoggedIn: Boolean) {
+      this.isLoggedIn.value = isLoggedIn
    }
 }

@@ -439,7 +439,8 @@ fun CoinDetailScreenContent(
                         Price(
                            coinTicker = _dataStateTicker.coin!!,
                            coinLogo = dataState.logo,
-                           modifierHashMap = modifierHashMap
+                           modifierHashMap = modifierHashMap,
+                           navController = navController
                         )
                      }
 

@@ -1,9 +1,12 @@
 package com.aaronfabian.applejuice.presentation.sign_in
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -13,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,6 +25,8 @@ import androidx.navigation.NavController
 import com.aaronfabian.applejuice.R
 import com.aaronfabian.applejuice.presentation.Screen
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
+import com.aaronfabian.applejuice.presentation.ui.theme.mTextPrimary
+import com.aaronfabian.applejuice.store.NavigationComposition
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -32,6 +39,7 @@ fun SignInScreen(
    var email by rememberSaveable { mutableStateOf("") }
    var password by rememberSaveable { mutableStateOf("") }
    val scope = rememberCoroutineScope()
+   val cmp = NavigationComposition.current
    val context = LocalContext.current
    val state = viewModel.state.collectAsState(initial = null)
 
@@ -72,15 +80,22 @@ fun SignInScreen(
       TextField(
          value = email,
          onValueChange = { email = it },
-         modifier = Modifier.fillMaxWidth(),
+         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
          colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = mPrimary,
-            cursorColor = Color.Black,
-            disabledLabelColor = mPrimary,
+            cursorColor = mPrimary,
+            textColor = mTextPrimary,
+            backgroundColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
          ),
          shape = RoundedCornerShape(8.dp),
          singleLine = true,
+         modifier = Modifier
+            .fillMaxWidth()
+            .border(
+               BorderStroke(width = 1.dp, color = mPrimary),
+               shape = RoundedCornerShape(16.dp)
+            ),
          placeholder = {
             Text(text = "Email")
          },
@@ -91,19 +106,28 @@ fun SignInScreen(
       TextField(
          value = password,
          onValueChange = { password = it },
-         modifier = Modifier.fillMaxWidth(),
+         modifier = Modifier
+            .fillMaxWidth()
+            .border(
+               BorderStroke(width = 1.dp, color = mPrimary),
+               shape = RoundedCornerShape(16.dp)
+            ),
+         singleLine = true,
+         shape = RoundedCornerShape(8.dp),
          colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = mPrimary,
-            cursorColor = Color.Black,
-            disabledLabelColor = mPrimary,
+            cursorColor = mPrimary,
+            textColor = mTextPrimary,
+            backgroundColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
          ),
-         shape = RoundedCornerShape(8.dp),
-         singleLine = true,
+         visualTransformation = PasswordVisualTransformation(),
          placeholder = {
             Text(text = "Password")
          },
       )
+
+      Spacer(modifier = Modifier.height(40.dp))
 
       Button(
          onClick = {
@@ -113,12 +137,15 @@ fun SignInScreen(
 
          }, modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 20.dp, start = 30.dp, end = 30.dp),
+            .border(
+               BorderStroke(width = 1.dp, color = Color.LightGray),
+               shape = RoundedCornerShape(16.dp)
+            ),
          colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color.LightGray,
+            backgroundColor = Color.Transparent,
             contentColor = Color.White,
          ),
-         shape = RoundedCornerShape(size = 15.dp)
+         shape = RoundedCornerShape(size = 16.dp)
       ) {
          Text(text = "Sign In", color = Color.White, modifier = Modifier.padding(7.dp))
       }
@@ -172,6 +199,7 @@ fun SignInScreen(
                if (state.value?.isSuccess?.isNotEmpty() == true) {
                   val success = state.value?.isSuccess
                   Toast.makeText(context, "${success}", Toast.LENGTH_LONG).show()
+                  cmp.setIsLoggedIn(true)
                   delay(1500) // go to homescreen
                   navController.navigate(Screen.HomeScreen.route)
                }

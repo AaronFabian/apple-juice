@@ -83,6 +83,8 @@ class CoinDetailViewModel @Inject constructor(
          }
       }.launchIn(viewModelScope)
    }
+}
+
 
 //   private fun getTicker() {
 //      getCoinTicker(this.storedCoinId).onEach { result ->
@@ -101,4 +103,3 @@ class CoinDetailViewModel @Inject constructor(
 //         }
 //      }.launchIn(viewModelScope)
 //   }
-}

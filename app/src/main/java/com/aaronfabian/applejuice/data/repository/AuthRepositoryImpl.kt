@@ -1,6 +1,8 @@
 package com.aaronfabian.applejuice.data.repository
 
+import com.aaronfabian.applejuice.utils.FirebaseClass
 import com.aaronfabian.applejuice.utils.Resource
+import com.aaronfabian.applejuice.utils.User
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.Flow
@@ -22,10 +24,22 @@ class AuthRepositoryImpl @Inject constructor(
       }
    }
 
-   override fun registerUser(email: String, password: String): Flow<Resource<AuthResult>> {
+   override fun registerUser(
+      email: String,
+      password: String,
+      name: String
+   ): Flow<Resource<AuthResult>> {
       return flow {
          emit(Resource.Loading())
          val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+         result.user?.let {
+            val firebaseUser = result.user
+            val registeredEmail = firebaseUser!!.email!!
+            val user = User(uid = it.uid, name = name, registeredEmail)
+
+            FirebaseClass().postRegisteredUser(it.uid, user)
+         }
+         firebaseAuth.signOut()
          emit(Resource.Success(result))
       }.catch {
          emit(Resource.Error(it.message.toString()))

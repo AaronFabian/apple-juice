@@ -8,8 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -19,13 +18,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
 import com.aaronfabian.applejuice.R
 import com.aaronfabian.applejuice.domain.model.CoinTicker
+import com.aaronfabian.applejuice.presentation.Screen
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
+import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.CustomDialog
+import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.DialogChildOnConfirmBuy
+import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.DialogChildOnShouldSignIn
+import com.aaronfabian.applejuice.store.NavigationComposition
 import com.aaronfabian.applejuice.utils.StringUtil
 import com.aaronfabian.applejuice.utils.dataClass.TablePriceHelperData
 import java.math.BigDecimal
@@ -33,7 +38,17 @@ import java.math.RoundingMode
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Price(coinTicker: CoinTicker, coinLogo: String, modifierHashMap: HashMap<String, Modifier>) {
+fun Price(
+   coinTicker: CoinTicker,
+   coinLogo: String,
+   modifierHashMap: HashMap<String, Modifier>,
+   navController: NavController,
+) {
+   val cmp = NavigationComposition.current
+
+   var isShowDialog by remember {
+      mutableStateOf(false)
+   }
 
    val toFixDecimalHelper = { price: Double ->
       BigDecimal(price)
@@ -117,7 +132,7 @@ fun Price(coinTicker: CoinTicker, coinLogo: String, modifierHashMap: HashMap<Str
    ) {
       IconButton(
          onClick = {
-            println("buy")
+            isShowDialog = true
          }, modifier = Modifier
             .background(Color.Green)
             .weight(.3f)
@@ -174,5 +189,35 @@ fun Price(coinTicker: CoinTicker, coinLogo: String, modifierHashMap: HashMap<Str
             )
          }
       }
+   }
+
+   if (isShowDialog) {
+
+      if (cmp.isLoggedIn)
+         CustomDialog(
+            onConfirm = {
+               println("confirm")
+            },
+            onDismiss = {
+               isShowDialog = false
+            },
+            children = { onDis, onCon ->
+               DialogChildOnConfirmBuy(onConfirm = { onCon() }, onDismiss = { onDis() })
+            }
+         )
+      else
+         CustomDialog(
+            onDismiss = {
+               println("not signed in !")
+               isShowDialog = false
+            },
+            onConfirm = {
+               println("go to log in screen")
+               navController.navigate(Screen.SignInScreen.route)
+            },
+            children = { onDis, onCon ->
+               DialogChildOnShouldSignIn(onConfirm = { onCon() }, onDismiss = { onDis() })
+            }
+         )
    }
 }

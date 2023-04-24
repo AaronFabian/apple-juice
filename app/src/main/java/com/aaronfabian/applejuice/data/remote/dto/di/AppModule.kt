@@ -61,4 +61,12 @@ object AppModule {
    fun providesRepositoryImplementationImpl(firebaseAuth: FirebaseAuth): AuthRepository {
       return AuthRepositoryImpl(firebaseAuth)
    }
+
+//   @Provides
+//   @Singleton
+//   fun providesFireStore() = FirebaseFirestore.getInstance()
+//
+//   @Provides
+//   @Singleton
+//   fun providesRepositoryFireStoreImpl(firestore: FirebaseFirestore):  {}
 }
