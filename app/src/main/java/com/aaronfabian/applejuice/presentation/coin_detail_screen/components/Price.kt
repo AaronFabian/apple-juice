@@ -27,9 +27,9 @@ import com.aaronfabian.applejuice.R
 import com.aaronfabian.applejuice.domain.model.CoinTicker
 import com.aaronfabian.applejuice.presentation.Screen
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
-import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.CustomDialog
 import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.DialogChildOnConfirmBuy
 import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.DialogChildOnShouldSignIn
+import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.customDialogComponent.CustomDialog
 import com.aaronfabian.applejuice.store.NavigationComposition
 import com.aaronfabian.applejuice.utils.StringUtil
 import com.aaronfabian.applejuice.utils.dataClass.TablePriceHelperData
