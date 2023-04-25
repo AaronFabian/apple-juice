@@ -13,6 +13,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.aaronfabian.applejuice.domain.model.User
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.CoinDetailScreen
 import com.aaronfabian.applejuice.presentation.home_screen.HomeScreen
 import com.aaronfabian.applejuice.presentation.people_detail_screen.PeopleDetailScreen
@@ -25,7 +26,6 @@ import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.Botto
 import com.aaronfabian.applejuice.store.NavigationComposition
 import com.aaronfabian.applejuice.store.NavigationCompositionProvider
 import com.aaronfabian.applejuice.utils.FirebaseClass
-import com.aaronfabian.applejuice.utils.User
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -75,6 +75,7 @@ class MainActivity : ComponentActivity() {
                      }
 
                      composable(route = Screen.CoinDetailScreen.route + "/{coinId}") {
+                        LaunchedEffect(Unit) { hideBottomBar = false }
                         CoinDetailScreen(navController = navController)
                      }
 
@@ -99,6 +100,8 @@ class MainActivity : ComponentActivity() {
                      }
 
                      composable(route = Screen.PortfolioScreen.route) {
+                        // TODO: As a log out button for a moment
+
                         val cmp = NavigationComposition.current
 
                         Text(text = "Portfolio screen")

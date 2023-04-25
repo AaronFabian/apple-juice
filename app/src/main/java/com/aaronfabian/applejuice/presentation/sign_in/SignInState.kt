@@ -1,8 +1,10 @@
 package com.aaronfabian.applejuice.presentation.sign_in
 
+import com.google.firebase.auth.FirebaseUser
+
 data class SignInState(
    val isLoading: Boolean = false,
-   val isSuccess: String? = "",
+   val isSuccess: FirebaseUser? = null,
    val isError: String? = ""
 )
 

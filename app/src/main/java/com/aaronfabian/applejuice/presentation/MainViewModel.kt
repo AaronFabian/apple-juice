@@ -1,10 +1,11 @@
 package com.aaronfabian.applejuice.presentation
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aaronfabian.applejuice.domain.model.User
 import com.aaronfabian.applejuice.utils.Constants
-import com.aaronfabian.applejuice.utils.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
@@ -52,7 +53,7 @@ class MainViewModel : ViewModel() {
             this.isLoggedIn.value = true
          } catch (e: Exception) {
             e.printStackTrace()
-            println("something wrong error at MainViewModel")
+            Log.e(Constants.ERROR_TAG, "something wrong error at MainViewModel")
          }
       }
 

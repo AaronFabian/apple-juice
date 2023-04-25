@@ -1,8 +1,8 @@
 package com.aaronfabian.applejuice.data.repository
 
+import com.aaronfabian.applejuice.domain.model.User
 import com.aaronfabian.applejuice.utils.FirebaseClass
 import com.aaronfabian.applejuice.utils.Resource
-import com.aaronfabian.applejuice.utils.User
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.Flow

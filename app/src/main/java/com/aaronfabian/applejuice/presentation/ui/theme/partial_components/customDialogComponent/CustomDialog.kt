@@ -11,8 +11,12 @@ import androidx.compose.ui.window.DialogProperties
 @Composable
 fun CustomDialog(
    onDismiss: () -> Unit,
-   onConfirm: () -> Unit,
-   children: @Composable (onDis: () -> Unit, onCon: () -> Unit) -> Unit
+   onConfirm: (param: String?, param2: String?) -> Unit,
+   text1: String = "",
+   text2: String = "",
+   text3: String = "",
+   iconId: String = "",
+   children: @Composable (onDis: () -> Unit, onCon: (par: String?, par2: String?) -> Unit, text1: String, text2: String, text3: String, iconId: String) -> Unit
 ) {
 
 
@@ -22,6 +26,6 @@ fun CustomDialog(
          usePlatformDefaultWidth = false
       )
    ) {
-      children(onDismiss, onConfirm)
+      children(onDismiss, onConfirm, text1, text2, text3, iconId)
    }
 }

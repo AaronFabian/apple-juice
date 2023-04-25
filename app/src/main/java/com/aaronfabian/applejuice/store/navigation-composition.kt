@@ -3,8 +3,8 @@ package com.aaronfabian.applejuice.store
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import com.aaronfabian.applejuice.domain.model.User
 import com.aaronfabian.applejuice.presentation.MainViewModel
-import com.aaronfabian.applejuice.utils.User
 
 data class NavigationClass(
    val screen: String = "",

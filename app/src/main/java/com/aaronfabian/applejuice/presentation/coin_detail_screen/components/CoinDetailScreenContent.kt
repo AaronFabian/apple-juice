@@ -437,6 +437,9 @@ fun CoinDetailScreenContent(
                            containerPriceTickerModifier
 
                         Price(
+                           coinId = dataState.id!!,
+                           coinName = dataState.name!!,
+                           coinSymbol = dataState.symbol!!,
                            coinTicker = _dataStateTicker.coin!!,
                            coinLogo = dataState.logo,
                            modifierHashMap = modifierHashMap,

@@ -23,12 +23,16 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aaronfabian.applejuice.R
+import com.aaronfabian.applejuice.domain.model.User
 import com.aaronfabian.applejuice.presentation.Screen
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
 import com.aaronfabian.applejuice.presentation.ui.theme.mTextPrimary
 import com.aaronfabian.applejuice.store.NavigationComposition
+import com.aaronfabian.applejuice.utils.Constants
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun SignInScreen(
@@ -196,10 +200,22 @@ fun SignInScreen(
 
          LaunchedEffect(key1 = state.value?.isSuccess) {
             scope.launch {
-               if (state.value?.isSuccess?.isNotEmpty() == true) {
-                  val success = state.value?.isSuccess
-                  Toast.makeText(context, "${success}", Toast.LENGTH_LONG).show()
+               if (state.value?.isSuccess != null) {
+
+                  // TODO: Refactor this code please and use FirebaseClass instead!
+                  val userAuth = state.value?.isSuccess!!
+                  val userDocument = FirebaseFirestore
+                     .getInstance()
+                     .collection(Constants.USERS_COLLECTION)
+                     .document(userAuth.uid)
+                     .get()
+                     .await()
+
+                  val user = userDocument.toObject(User::class.java)!!
+
+                  Toast.makeText(context, "Sign in success", Toast.LENGTH_LONG).show()
                   cmp.setIsLoggedIn(true)
+                  cmp.setUser(user)
                   delay(1500) // go to homescreen
                   navController.navigate(Screen.HomeScreen.route)
                }

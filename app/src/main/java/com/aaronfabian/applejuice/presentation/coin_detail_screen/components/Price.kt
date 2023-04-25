@@ -1,6 +1,7 @@
 package com.aaronfabian.applejuice.presentation.coin_detail_screen.components
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,49 +26,69 @@ import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
 import com.aaronfabian.applejuice.R
 import com.aaronfabian.applejuice.domain.model.CoinTicker
+import com.aaronfabian.applejuice.domain.model.Coins
 import com.aaronfabian.applejuice.presentation.Screen
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
-import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.DialogChildOnConfirmBuy
 import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.DialogChildOnShouldSignIn
 import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.customDialogComponent.CustomDialog
+import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.customDialogComponent.DialogChildOnConfirmBuy
 import com.aaronfabian.applejuice.store.NavigationComposition
+import com.aaronfabian.applejuice.utils.FirebaseClass
 import com.aaronfabian.applejuice.utils.StringUtil
 import com.aaronfabian.applejuice.utils.dataClass.TablePriceHelperData
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Price(
+   coinId: String,
+   coinName: String,
+   coinSymbol: String,
    coinTicker: CoinTicker,
    coinLogo: String,
    modifierHashMap: HashMap<String, Modifier>,
    navController: NavController,
 ) {
    val cmp = NavigationComposition.current
+   val context = LocalContext.current
+   val scope = rememberCoroutineScope()
 
    var isShowDialog by remember {
       mutableStateOf(false)
    }
 
-   val toFixDecimalHelper = { price: Double ->
+   var buy = remember {
+      mutableStateOf("Buy")
+   }
+
+   var isAllowedToBuy = remember {
+      mutableStateOf(true)
+   }
+
+   val toFixDecimalHelper = { price: Double, scale: Int? ->
       BigDecimal(price)
          .setScale(
-            2,
+            scale ?: 2,
             RoundingMode.HALF_EVEN
          )
    }
 
    val imageLoader = ImageLoader
-      .Builder(LocalContext.current)
-      .componentRegistry { add(SvgDecoder(LocalContext.current)) }
+      .Builder(context)
+      .componentRegistry { add(SvgDecoder(context)) }
       .build()
+
+   val balance = cmp.user.money
 
 
    val tablePriceDataClass = TablePriceHelperData.getTableData()
    val getPriceReportArr = ArrayList<String>()
 
-   val coinPrice = coinTicker.quotes.USD.price // not include in array
+   val price = coinTicker.quotes.USD.price // not include in array
    val volumeIn24h = coinTicker.quotes.USD.volume_24h
    val volumeChangeIn24h = coinTicker.quotes.USD.volume_24h_change_24h
    val marketCap = coinTicker.quotes.USD.market_cap.toDouble()
@@ -88,9 +109,9 @@ fun Price(
    val maxSupply = coinTicker.max_supply
    val circulatingCoin = coinTicker.circulating_supply
 
-   getPriceReportArr.add("$\t${toFixDecimalHelper(volumeIn24h)}")
+   getPriceReportArr.add("$\t${toFixDecimalHelper(volumeIn24h, null)}")
    getPriceReportArr.add("$volumeChangeIn24h")
-   getPriceReportArr.add("$\t${toFixDecimalHelper(marketCap)}")
+   getPriceReportArr.add("$\t${toFixDecimalHelper(marketCap, null)}")
    getPriceReportArr.add("$marketCapChangeIn24h\t%")
    getPriceReportArr.add("$percentChangeIn15m\t%")
    getPriceReportArr.add("$percentChangeIn30m\t%")
@@ -101,7 +122,7 @@ fun Price(
    getPriceReportArr.add("$percentChangeIn7d\t%")
    getPriceReportArr.add("$percentChangeIn30d\t%")
    getPriceReportArr.add("$percentChangeIn1y\t%")
-   getPriceReportArr.add("$\t${toFixDecimalHelper(allTimeHighPrice)}")
+   getPriceReportArr.add("$\t${toFixDecimalHelper(allTimeHighPrice, null)}")
    getPriceReportArr.add(StringUtil.dateToReadableString(allTimeDate))
    getPriceReportArr.add("$percentFromAth\t%")
    getPriceReportArr.add("$totalSupply")
@@ -119,7 +140,7 @@ fun Price(
    }
 
    Text(
-      text = "$${toFixDecimalHelper(coinPrice)}",
+      text = "$${toFixDecimalHelper(price, null)}",
       fontSize = 18.sp,
       color = Color.LightGray,
       fontWeight = FontWeight.SemiBold,
@@ -142,7 +163,7 @@ fun Price(
                painter = painterResource(id = R.drawable.ic_buy),
                contentDescription = "Icon buy"
             )
-            Text(text = "Buy", fontSize = 16.sp, color = Color.White)
+            Text(text = buy.value, fontSize = 16.sp, color = Color.White)
          }
       }
 
@@ -195,28 +216,84 @@ fun Price(
 
       if (cmp.isLoggedIn)
          CustomDialog(
-            onConfirm = {
-               println("confirm")
+            onConfirm = { remainingBalance, coinAmount ->
+
+               if (!isAllowedToBuy.value) return@CustomDialog
+
+               isAllowedToBuy.value = false
+               scope.launch {
+
+                  try {
+                     val currentTime = LocalDateTime.now()
+                     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                     val formattedTime = currentTime.format(formatter)
+
+
+                     val coins = Coins(
+                        coinId = coinId,
+                        purchaseTime = formattedTime,
+                        coinName = coinName,
+                        ownerId = cmp.user.uid,
+                        coinUri = coinLogo,
+                        amount = coinAmount!!.toDouble()
+                     )
+
+                     val updateMoney =
+                        FirebaseClass().updateUserMoney(remainingBalance!!, cmp.user.uid)
+                     val postBoughtCoins = FirebaseClass().postPurchasedCoin(cmp.user.uid, coins)
+                     if (updateMoney && postBoughtCoins) {
+                        cmp.user.money = remainingBalance.toDouble()
+                        isShowDialog = false
+                        Toast.makeText(
+                           context,
+                           "Purchase complete ! Thank you for your purchase.",
+                           Toast.LENGTH_LONG
+                        ).show()
+                     } else
+                        Toast.makeText(
+                           context,
+                           "Something wrong ! Please try again later.",
+                           Toast.LENGTH_LONG
+                        ).show()
+                  } catch (e: Exception) {
+                     e.printStackTrace()
+                     Toast.makeText(
+                        context,
+                        "Something wrong :( Please try again later.",
+                        Toast.LENGTH_LONG
+                     ).show()
+                  }
+                  
+                  isAllowedToBuy.value = true
+               }
             },
             onDismiss = {
                isShowDialog = false
             },
-            children = { onDis, onCon ->
-               DialogChildOnConfirmBuy(onConfirm = { onCon() }, onDismiss = { onDis() })
+            text1 = coinName,
+            text2 = coinSymbol,
+            text3 = toFixDecimalHelper(price, 5).toString(),
+            iconId = coinLogo,
+            children = { onDis, onCon, text1, text2, text3, _ ->
+               DialogChildOnConfirmBuy(
+                  onConfirm = onCon,
+                  onDismiss = onDis,
+                  coinName = text1,
+                  coinSymbol = text2,
+                  price = text3,
+               )
             }
          )
       else
          CustomDialog(
             onDismiss = {
-               println("not signed in !")
                isShowDialog = false
             },
-            onConfirm = {
-               println("go to log in screen")
+            onConfirm = { _, _ ->
                navController.navigate(Screen.SignInScreen.route)
             },
-            children = { onDis, onCon ->
-               DialogChildOnShouldSignIn(onConfirm = { onCon() }, onDismiss = { onDis() })
+            children = { onDis, onCon, _, _, _, _ ->
+               DialogChildOnShouldSignIn(onConfirm = { onCon(null, null) }, onDismiss = { onDis() })
             }
          )
    }
