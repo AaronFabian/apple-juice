@@ -37,6 +37,7 @@ fun CoinDetailScreenContent(
    _dataStateTicker: CoinTickerState,
    _coinGraphState: CoinGraphState,
    navController: NavController,
+   coinColor: String
 ) {
    var coinDetailScreenState by remember {
       mutableStateOf("price")
@@ -442,8 +443,9 @@ fun CoinDetailScreenContent(
                            coinSymbol = dataState.symbol!!,
                            coinTicker = _dataStateTicker.coin!!,
                            coinLogo = dataState.logo,
+                           coinColor = coinColor,
                            modifierHashMap = modifierHashMap,
-                           navController = navController
+                           navController = navController,
                         )
                      }
 

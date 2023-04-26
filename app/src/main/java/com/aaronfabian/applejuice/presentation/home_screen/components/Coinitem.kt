@@ -28,6 +28,7 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
    val coinPrice = coinInfo.price ?: 0
    val coinChange = coinInfo.change?.toFloat() ?: 0f
    val coinSparkLine = coinInfo.sparkline ?: emptyList()
+   val coinColor = coinInfo.color ?: Color.LightGray
 
    Row(
       verticalAlignment = Alignment.CenterVertically,
@@ -38,8 +39,7 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
 
             val strCoinId = StringUtil.toPaprikaID(coinName, coinSymbol)
 
-            println(strCoinId)
-            navController.navigate(Screen.CoinDetailScreen.route + "/${strCoinId}")
+            navController.navigate(Screen.CoinDetailScreen.route + "/${strCoinId}/${coinColor}")
          }
    ) {
 

@@ -4,6 +4,7 @@ import com.aaronfabian.applejuice.domain.model.Coins
 import com.aaronfabian.applejuice.domain.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resumeWithException
@@ -43,7 +44,9 @@ class FirebaseClass {
             .addOnFailureListener { exception ->
                continuation.resumeWithException(exception)
             }
-            .addOnCanceledListener { continuation.cancel() }
+            .addOnCanceledListener {
+               continuation.cancel()
+            }
       }
 
    suspend fun postPurchasedCoin(uid: String, coins: Coins) =
@@ -59,6 +62,26 @@ class FirebaseClass {
             .addOnFailureListener { exception ->
                continuation.resumeWithException(exception)
             }
-            .addOnCanceledListener { continuation.cancel() }
+            .addOnCanceledListener {
+               continuation.cancel()
+            }
+      }
+
+   suspend fun getUserCoin(uid: String) =
+      suspendCancellableCoroutine<QuerySnapshot> { continuation ->
+
+         mFireStore
+            .collection(Constants.COINS_COLLECTION)
+            .whereEqualTo(Constants.OWNER_UID, uid)
+            .get()
+            .addOnCompleteListener {
+               continuation.resumeWith(Result.success(it.result))
+            }
+            .addOnFailureListener { exception ->
+               continuation.resumeWithException(exception)
+            }
+            .addOnCanceledListener {
+               continuation.cancel()
+            }
       }
 }

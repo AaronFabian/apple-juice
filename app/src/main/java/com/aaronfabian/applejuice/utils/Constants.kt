@@ -11,7 +11,9 @@ object Constants {
 
    // fields
    const val USER_MONEY = "money"
+   const val OWNER_UID = "ownerUid"
 
    // Error log
-   const val ERROR_TAG = "My Error"
+   const val ERROR_TAG = "My error"
+   const val ERROR_TAG_FIREBASE = "My Firebase Error"
 }

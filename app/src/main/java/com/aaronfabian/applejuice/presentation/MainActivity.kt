@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
                         HomeScreen(navController = navController)
                      }
 
-                     composable(route = Screen.CoinDetailScreen.route + "/{coinId}") {
+                     composable(route = Screen.CoinDetailScreen.route + "/{coinId}/{coinColor}") {
                         LaunchedEffect(Unit) { hideBottomBar = false }
                         CoinDetailScreen(navController = navController)
                      }

@@ -49,6 +49,7 @@ fun Price(
    coinName: String,
    coinSymbol: String,
    coinTicker: CoinTicker,
+   coinColor: String,
    coinLogo: String,
    modifierHashMap: HashMap<String, Modifier>,
    navController: NavController,
@@ -231,11 +232,12 @@ fun Price(
 
                      val coins = Coins(
                         coinId = coinId,
-                        purchaseTime = formattedTime,
                         coinName = coinName,
-                        ownerId = cmp.user.uid,
                         coinUri = coinLogo,
-                        amount = coinAmount!!.toDouble()
+                        coinColor = coinColor,
+                        ownerUid = cmp.user.uid,
+                        purchaseTime = formattedTime,
+                        amount = coinAmount!!.toDouble(),
                      )
 
                      val updateMoney =
@@ -263,7 +265,7 @@ fun Price(
                         Toast.LENGTH_LONG
                      ).show()
                   }
-                  
+
                   isAllowedToBuy.value = true
                }
             },

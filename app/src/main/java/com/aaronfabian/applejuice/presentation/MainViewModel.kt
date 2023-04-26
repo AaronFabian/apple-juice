@@ -19,7 +19,7 @@ class MainViewModel : ViewModel() {
    private val _isLoading = MutableStateFlow(true)
    val isLoading = _isLoading.asStateFlow()
 
-   var currentUserId = mutableStateOf("")
+   private var currentUserId = mutableStateOf("")
    var currentRoute = mutableStateOf(Screen.HomeScreen.route)
 
    var user = mutableStateOf(User())
