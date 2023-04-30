@@ -24,13 +24,13 @@ object NavbarHelperData {
       )
       navbarData.add(nav2)
 
-      val nav3 = NavbarDataClass(
-         miniText = "Market",
-         drawable = R.drawable.ic_graph,
-         contentDescription = "Market Icon Button",
-         route = Screen.MarketScreen.route
-      )
-      navbarData.add(nav3)
+      //      val nav3 = NavbarDataClass(
+      //         miniText = "Market",
+      //         drawable = R.drawable.ic_graph,
+      //         contentDescription = "Market Icon Button",
+      //         route = Screen.MarketScreen.route
+      //      )
+      //      navbarData.add(nav3)
 
       val nav4 = NavbarDataClass(
          miniText = "News",

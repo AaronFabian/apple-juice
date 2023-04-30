@@ -13,7 +13,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.aaronfabian.applejuice.domain.model.User
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.CoinDetailScreen
 import com.aaronfabian.applejuice.presentation.home_screen.HomeScreen
 import com.aaronfabian.applejuice.presentation.my_coin_detail_screen.MyCoinDetailScreen
@@ -25,9 +24,7 @@ import com.aaronfabian.applejuice.presentation.sign_up.SignUpScreen
 import com.aaronfabian.applejuice.presentation.tag_detail_screen.TagDetailScreen
 import com.aaronfabian.applejuice.presentation.ui.theme.AppleJuiceTheme
 import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.BottomNavbar
-import com.aaronfabian.applejuice.store.NavigationComposition
 import com.aaronfabian.applejuice.store.NavigationCompositionProvider
-import com.aaronfabian.applejuice.utils.FirebaseClass
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -104,13 +101,6 @@ class MainActivity : ComponentActivity() {
                      }
 
                      composable(route = Screen.MarketScreen.route) {
-                        // TODO: As a log out button for a moment
-
-                        val cmp = NavigationComposition.current
-
-                        cmp.setUser(User())
-                        cmp.setIsLoggedIn(false)
-                        FirebaseClass().signOutUser()
                         Text(text = "Market screen")
                      }
 

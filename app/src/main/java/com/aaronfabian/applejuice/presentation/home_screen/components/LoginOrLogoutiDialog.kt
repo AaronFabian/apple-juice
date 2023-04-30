@@ -1,4 +1,4 @@
-package com.aaronfabian.applejuice.presentation.ui.theme.partial_components
+package com.aaronfabian.applejuice.presentation.home_screen.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -6,6 +6,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,14 +16,54 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavController
 import com.aaronfabian.applejuice.R
+import com.aaronfabian.applejuice.presentation.Screen
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
+import com.aaronfabian.applejuice.store.NavigationComposition
+import com.aaronfabian.applejuice.utils.setZero
 
 @Composable
-fun DialogChildOnShouldSignIn(
+fun LoginOrLogoutDialog(
    onDismiss: () -> Unit,
-   onConfirm: () -> Unit
+   onConfirm: (par: String?, par2: String?, par3: String?) -> Unit,
+   navController: NavController
 ) {
+
+   val cmp = NavigationComposition.current
+
+   val iconLoginOrLogout = remember {
+      if (cmp.isLoggedIn)
+         mutableStateOf(R.drawable.ic_logout)
+      else
+         mutableStateOf(R.drawable.baseline_login_24)
+   }
+
+   val textDesc = remember {
+      if (cmp.isLoggedIn)
+         mutableStateOf("Sign out ? press confirm button to logout screen")
+      else
+         mutableStateOf("Welcome back !")
+   }
+
+   val shouldSignIn = remember {
+      if (cmp.isLoggedIn)
+         mutableStateOf("Confirm")
+      else
+         mutableStateOf("Go to sign in")
+   }
+
+   val onHandleShouldSignIn = {
+      if (cmp.isLoggedIn) {
+         setZero(cmp)
+         onConfirm("logout", null, null)
+      } else
+         navController.navigate(Screen.SignInScreen.route)
+
+
+      onDismiss()
+   }
+
    Card(
       elevation = 5.dp,
       shape = RoundedCornerShape(15.dp),
@@ -44,8 +86,8 @@ fun DialogChildOnShouldSignIn(
          val spacerEndRef = createRef()
 
          Icon(
-            painter = painterResource(id = R.drawable.baseline_login_24),
-            contentDescription = "Icon login",
+            painter = painterResource(id = iconLoginOrLogout.value),
+            contentDescription = "Icon Sign in or Sing out",
             tint = Color(0xFF0052FF),
             modifier = Modifier
                .size(60.dp)
@@ -69,7 +111,7 @@ fun DialogChildOnShouldSignIn(
          )
 
          Text(
-            text = "Oops..looks like you are not signed in ! Please login to continue this feature.",
+            text = textDesc.value,
             style = MaterialTheme.typography.h6,
             textAlign = TextAlign.Center,
             modifier = Modifier
@@ -103,7 +145,7 @@ fun DialogChildOnShouldSignIn(
                },
          ) {
             Button(
-               onClick = { onDismiss() }, colors = ButtonDefaults.buttonColors(
+               onClick = onDismiss, colors = ButtonDefaults.buttonColors(
                   backgroundColor = mPrimary,
                   contentColor = Color.White,
                ),
@@ -121,9 +163,8 @@ fun DialogChildOnShouldSignIn(
             }
 
             Button(
-               onClick = {
-                  onConfirm()
-               }, colors = ButtonDefaults.buttonColors(
+               onClick = onHandleShouldSignIn,
+               colors = ButtonDefaults.buttonColors(
                   backgroundColor = mPrimary,
                   contentColor = Color.White,
                ),
@@ -133,7 +174,7 @@ fun DialogChildOnShouldSignIn(
                shape = CircleShape
             ) {
                Text(
-                  text = "Sign In",
+                  text = shouldSignIn.value,
                   style = MaterialTheme.typography.h6,
                   fontWeight = FontWeight.Bold,
                   textAlign = TextAlign.Center

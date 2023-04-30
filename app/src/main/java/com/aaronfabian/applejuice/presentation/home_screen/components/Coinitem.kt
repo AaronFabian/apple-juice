@@ -73,7 +73,7 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
 
       Box(
          modifier = Modifier
-            .weight(1.5f)
+            .weight(1.3f)
             .height(54.dp)
       ) {
          StockChart(

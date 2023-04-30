@@ -30,8 +30,11 @@ import androidx.navigation.NavController
 import com.aaronfabian.applejuice.R
 import com.aaronfabian.applejuice.presentation.Screen
 import com.aaronfabian.applejuice.presentation.home_screen.components.CoinItem
+import com.aaronfabian.applejuice.presentation.home_screen.components.LoginOrLogoutDialog
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
 import com.aaronfabian.applejuice.presentation.ui.theme.mTextPrimary
+import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.customDialogComponent.CustomDialog
+import com.aaronfabian.applejuice.store.NavigationComposition
 
 @OptIn(ExperimentalComposeUiApi::class) // ??
 @Composable
@@ -42,12 +45,34 @@ fun HomeScreen(
    val state = viewModel.state.value
    val stateNext = viewModel.stateNext.value
 
+   val cmp = NavigationComposition.current
+
    var tfSearchState by remember {
       mutableStateOf("")
    }
 
+
+   val iconLoginOrLoggedOut = remember {
+      mutableStateOf(R.drawable.baseline_login_24)
+   }
+
+   LaunchedEffect(cmp.isLoggedIn) {
+      if (cmp.isLoggedIn)
+         iconLoginOrLoggedOut.value = R.drawable.ic_logout
+   }
+
+
+   val isShowDialog = remember {
+      mutableStateOf(false)
+   }
+
    val listState = rememberLazyListState()
    val keyboardController = LocalSoftwareKeyboardController.current
+
+   val onReUpdateIcon = {
+      iconLoginOrLoggedOut.value = R.drawable.baseline_login_24
+   }
+
 
    Box(Modifier.padding(top = 12.dp, start = 8.dp, end = 8.dp)) {
 
@@ -100,7 +125,7 @@ fun HomeScreen(
                })
             )
             IconButton(onClick = {
-               
+
             }) {
                Icon(
                   tint = Color.Gray,
@@ -109,10 +134,12 @@ fun HomeScreen(
                )
             }
 
-            IconButton(onClick = { }) {
+            IconButton(onClick = {
+               isShowDialog.value = true
+            }) {
                Icon(
                   tint = Color.Gray,
-                  painter = painterResource(id = R.drawable.baseline_notifications_24),
+                  painter = painterResource(id = iconLoginOrLoggedOut.value),
                   contentDescription = "Notification icon button"
                )
             }
@@ -310,6 +337,17 @@ fun HomeScreen(
    }
 
 
+   if (isShowDialog.value) {
+      CustomDialog(
+         onDismiss = { isShowDialog.value = false },
+         onConfirm = { option, _, _ ->
+            if (option == "logout") onReUpdateIcon()
+         },
+         children = { onDis, onCon, _, _, _, _ ->
+            LoginOrLogoutDialog(onDis, onCon, navController)
+         }
+      )
+   }
 }
 
 

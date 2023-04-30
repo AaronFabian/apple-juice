@@ -12,6 +12,7 @@ object Constants {
    const val COINS_COLLECTION = "coins"
 
    // fields
+   const val USER_NAME = "name"
    const val USER_MONEY = "money"
    const val OWNER_UID = "ownerUid"
    const val COIN_ID = "coinId"

@@ -23,7 +23,6 @@ fun BottomNavbar(navController: NavController) {
    //   }
 
    val screenState = NavigationComposition.current.screen
-   println(screenState)
 
    ConstraintLayout(
       modifier = Modifier
@@ -52,28 +51,28 @@ fun BottomNavbar(navController: NavController) {
          .constrainAs(iconAccount) {
             top.linkTo(parent.top)
             start.linkTo(iconHome.end)
-            end.linkTo(iconMarket.start)
+            end.linkTo(iconPortfolio.start)
          }
 
-      val iconMarketRefModifier = Modifier
-         .fillMaxHeight()
-         .constrainAs(iconMarket) {
-            top.linkTo(parent.top)
-            start.linkTo(iconAccount.end)
-            end.linkTo(iconPortfolio.end)
-         }
+//      val iconMarketRefModifier = Modifier
+//         .fillMaxHeight()
+//         .constrainAs(iconMarket) {
+//            top.linkTo(parent.top)
+//            start.linkTo(iconAccount.end)
+//            end.linkTo(iconPortfolio.end)
+//         }
 
       val iconPortfolioRefModifier = Modifier
          .fillMaxHeight()
          .constrainAs(iconPortfolio) {
             top.linkTo(parent.top)
-            start.linkTo(iconMarket.end)
+            start.linkTo(iconAccount.end)
             end.linkTo(parent.end)
          }
 
       arrayOfRefModifier.add(iconHomeRefModifier)
       arrayOfRefModifier.add(iconAccountRefModifier)
-      arrayOfRefModifier.add(iconMarketRefModifier)
+      // arrayOfRefModifier.add(iconMarketRefModifier)
       arrayOfRefModifier.add(iconPortfolioRefModifier)
 
       navbarHelperData.forEachIndexed { index, it ->

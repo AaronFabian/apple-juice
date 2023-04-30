@@ -279,7 +279,7 @@ fun CoinInformation(
                })
 
          Text(
-            text = "Coin Information",
+            text = "Coin information",
             fontSize = 18.sp,
             fontStyle = FontStyle.Italic,
             modifier = Modifier
