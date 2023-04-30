@@ -12,4 +12,6 @@ interface CoinRepository {
    suspend fun getCoinBySearch(query: String): CoinSearchDto
 
    suspend fun getCoinGraphBySymbol(symbols: String): CoinGraphDto
+
+   suspend fun getCoinByUuid(uuid: String): CoinDto
 }

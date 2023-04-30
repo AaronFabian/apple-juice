@@ -2,6 +2,7 @@ package com.aaronfabian.applejuice.data.remote.dto.di
 
 import com.aaronfabian.applejuice.data.remote.CoinPaprikaApi
 import com.aaronfabian.applejuice.data.remote.CoinRankingApi
+import com.aaronfabian.applejuice.data.remote.CryptoCompareApi
 import com.aaronfabian.applejuice.data.repository.*
 import com.aaronfabian.applejuice.utils.Constants
 import com.google.firebase.auth.FirebaseAuth
@@ -62,11 +63,20 @@ object AppModule {
       return AuthRepositoryImpl(firebaseAuth)
    }
 
-//   @Provides
-//   @Singleton
-//   fun providesFireStore() = FirebaseFirestore.getInstance()
-//
-//   @Provides
-//   @Singleton
-//   fun providesRepositoryFireStoreImpl(firestore: FirebaseFirestore):  {}
+   @Provides
+   @Singleton
+   fun provideCryptoCompare(): CryptoCompareApi {
+      return Retrofit
+         .Builder()
+         .baseUrl(Constants.BASE_URL_CRYPTO_NEWS)
+         .addConverterFactory(GsonConverterFactory.create())
+         .build()
+         .create(CryptoCompareApi::class.java)
+   }
+
+   @Provides
+   @Singleton
+   fun providesCryptoCompareImpl(api: CryptoCompareApi): CryptoCompareRepository {
+      return CryptoCompareImpl(api)
+   }
 }

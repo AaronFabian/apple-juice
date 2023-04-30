@@ -19,6 +19,7 @@ import com.aaronfabian.applejuice.presentation.home_screen.components.LoadSVGIma
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
 import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.NavbarBackButton
 import com.aaronfabian.applejuice.utils.StringUtil
+import com.aaronfabian.applejuice.utils.pickRandomColor
 import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.MainAxisAlignment
@@ -29,7 +30,6 @@ fun SearchScreen(
    navController: NavController,
    viewModel: SearchScreenViewModel = hiltViewModel()
 ) {
-
    val state = viewModel.state.value
 
    if (state.coin != null) {
@@ -67,7 +67,7 @@ fun SearchScreen(
 
                      println(strCoinId)
 
-                     navController.navigate(Screen.CoinDetailScreen.route + "/${strCoinId}")
+                     navController.navigate(Screen.CoinDetailScreen.route + "/${strCoinId}/${pickRandomColor()}/${coin.uuid}")
 
                   },
                   modifier = Modifier

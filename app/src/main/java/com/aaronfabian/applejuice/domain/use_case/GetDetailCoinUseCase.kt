@@ -3,11 +3,13 @@ package com.aaronfabian.applejuice.domain.use_case
 import com.aaronfabian.applejuice.data.remote.dto.toCoinDetailModel
 import com.aaronfabian.applejuice.data.remote.dto.toCoinGraphModel
 import com.aaronfabian.applejuice.data.remote.dto.toCoinTickerModel
+import com.aaronfabian.applejuice.data.remote.dto.toOneCoinModel
 import com.aaronfabian.applejuice.data.repository.CoinRepository
 import com.aaronfabian.applejuice.data.repository.CoinRepositoryPaprika
 import com.aaronfabian.applejuice.domain.model.CoinDetail
 import com.aaronfabian.applejuice.domain.model.CoinGraph
 import com.aaronfabian.applejuice.domain.model.CoinTicker
+import com.aaronfabian.applejuice.domain.model.OneCoin
 import com.aaronfabian.applejuice.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -77,4 +79,15 @@ class GetDetailCoinUseCase @Inject constructor(
    }
 
 
+   fun getCoinOneCoinViaRanking(coinUuid: String): Flow<Resource<OneCoin>> = flow {
+      try {
+         emit(Resource.Loading<OneCoin>())
+         val coin = repositoryRanking.getCoinByUuid(coinUuid).toOneCoinModel()
+         emit(Resource.Success<OneCoin>(data = coin))
+      } catch (e: HttpException) {
+         emit(Resource.Error<OneCoin>(e.localizedMessage ?: "An unexpected error occurred !"))
+      } catch (e: IOException) {
+         emit(Resource.Error<OneCoin>("Couldn't reach server. Check your internet connection."))
+      }
+   }
 }

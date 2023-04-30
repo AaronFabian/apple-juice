@@ -26,4 +26,8 @@ class CoinRepositoryImpl @Inject constructor(
    override suspend fun getCoinGraphBySymbol(symbols: String): CoinGraphDto {
       return rankingApi.getCoinGraphBySymbol(symbols)
    }
+
+   override suspend fun getCoinByUuid(uuid: String): CoinDto {
+      return rankingApi.getOneCoinByUuid(uuid)
+   }
 }

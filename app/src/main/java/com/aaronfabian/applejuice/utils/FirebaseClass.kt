@@ -3,6 +3,7 @@ package com.aaronfabian.applejuice.utils
 import com.aaronfabian.applejuice.domain.model.Coins
 import com.aaronfabian.applejuice.domain.model.User
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
@@ -49,9 +50,44 @@ class FirebaseClass {
             }
       }
 
+   suspend fun getCheckCoin(uid: String, coins: Coins) =
+      suspendCancellableCoroutine<Map<String, Any>?> { continuation ->
+         mFireStore
+            .collection(Constants.COINS_COLLECTION)
+            .document(uid)
+            .collection(coins.coinId)
+            .document(uid)
+            .get()
+            .addOnCompleteListener() { result ->
+               continuation.resumeWith(Result.success(result.result.data))
+            }
+      }
+
+   suspend fun getBoughtCoinAndTransaction(uid: String, coinId: String) =
+      suspendCancellableCoroutine<List<DocumentSnapshot>> { continuation ->
+
+         mFireStore
+            .collection(Constants.COINS_COLLECTION)
+            .whereEqualTo(Constants.OWNER_UID, uid)
+            .whereEqualTo(Constants.COIN_ID, coinId)
+            .get()
+            .addOnSuccessListener { res ->
+               // for (doc in res.documents) {
+               // println(doc.id + "->" + doc.data)
+               // }
+
+               continuation.resumeWith(Result.success(res.documents))
+            }
+            .addOnFailureListener { exception ->
+               continuation.resumeWithException(exception)
+            }
+            .addOnCanceledListener {
+               continuation.cancel()
+            }
+      }
+
    suspend fun postPurchasedCoin(uid: String, coins: Coins) =
       suspendCancellableCoroutine<Boolean> { continuation ->
-
          mFireStore
             .collection(Constants.COINS_COLLECTION)
             .document()
@@ -69,7 +105,6 @@ class FirebaseClass {
 
    suspend fun getUserCoin(uid: String) =
       suspendCancellableCoroutine<QuerySnapshot> { continuation ->
-
          mFireStore
             .collection(Constants.COINS_COLLECTION)
             .whereEqualTo(Constants.OWNER_UID, uid)
@@ -85,3 +120,16 @@ class FirebaseClass {
             }
       }
 }
+
+//         mFireStore
+//            .collection(Constants.COINS_COLLECTION)
+//            .document(uid)
+//            .collection(coins.coinId)
+//            .get()
+//            .addOnSuccessListener { res ->
+//               for (document in res) {
+//                  println("${document.id} -> ${document.data}")
+//               }
+//
+//               continuation.resumeWith(Result.success(true))
+//            }

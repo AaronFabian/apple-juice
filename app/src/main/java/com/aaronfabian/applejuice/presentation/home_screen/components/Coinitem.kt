@@ -16,6 +16,7 @@ import com.aaronfabian.applejuice.data.remote.dto.Coin
 import com.aaronfabian.applejuice.presentation.Screen
 import com.aaronfabian.applejuice.presentation.ui.theme.mTextPrimary
 import com.aaronfabian.applejuice.utils.StringUtil
+import com.aaronfabian.applejuice.utils.pickRandomColor
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -28,7 +29,8 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
    val coinPrice = coinInfo.price ?: 0
    val coinChange = coinInfo.change?.toFloat() ?: 0f
    val coinSparkLine = coinInfo.sparkline ?: emptyList()
-   val coinColor = coinInfo.color ?: Color.LightGray
+   val coinColor = coinInfo.color ?: pickRandomColor()
+
 
    Row(
       verticalAlignment = Alignment.CenterVertically,
@@ -38,8 +40,7 @@ fun CoinItem(coinInfo: Coin, navController: NavController) {
          .clickable {
 
             val strCoinId = StringUtil.toPaprikaID(coinName, coinSymbol)
-
-            navController.navigate(Screen.CoinDetailScreen.route + "/${strCoinId}/${coinColor}")
+            navController.navigate(Screen.CoinDetailScreen.route + "/${strCoinId}/${coinColor}/${coinInfo.uuid}")
          }
    ) {
 

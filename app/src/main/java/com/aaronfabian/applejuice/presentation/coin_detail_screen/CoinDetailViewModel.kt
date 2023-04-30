@@ -27,12 +27,14 @@ class CoinDetailViewModel @Inject constructor(
    val state3: State<CoinGraphState> = _state3
 
    var coinColor = ""
+   var coinUuid = ""
 
    init {
+      savedStateHandle.get<String>("coinColor")?.let { coinColor -> this.coinColor = coinColor }
+      savedStateHandle.get<String>("coinUuid")?.let { coinUuid -> this.coinUuid = coinUuid }
       savedStateHandle.get<String>("coinId")?.let { coinId -> getCoin(coinId) }
       savedStateHandle.get<String>("coinId")?.let { coinId -> getTickers(coinId) }
       savedStateHandle.get<String>("coinId")?.let { coinId -> getCoinGraph(coinId) }
-      savedStateHandle.get<String>("coinColor")?.let { coinColor -> this.coinColor = coinColor }
    }
 
    private fun getCoin(coinId: String) {

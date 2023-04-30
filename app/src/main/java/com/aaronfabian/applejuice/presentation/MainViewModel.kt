@@ -35,7 +35,7 @@ class MainViewModel : ViewModel() {
    private suspend fun checkIsSignedIn() {
       val currentUser = FirebaseAuth.getInstance().currentUser
 
-
+      // TODO: Please refactor this code usi Firebase class instead.
       if (currentUser != null) {
          try {
             currentUserId.value = currentUser.uid

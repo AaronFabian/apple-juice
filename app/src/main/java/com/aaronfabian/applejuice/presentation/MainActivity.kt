@@ -16,6 +16,8 @@ import androidx.navigation.compose.rememberNavController
 import com.aaronfabian.applejuice.domain.model.User
 import com.aaronfabian.applejuice.presentation.coin_detail_screen.CoinDetailScreen
 import com.aaronfabian.applejuice.presentation.home_screen.HomeScreen
+import com.aaronfabian.applejuice.presentation.my_coin_detail_screen.MyCoinDetailScreen
+import com.aaronfabian.applejuice.presentation.news_screen.NewsScreen
 import com.aaronfabian.applejuice.presentation.people_detail_screen.PeopleDetailScreen
 import com.aaronfabian.applejuice.presentation.search_screen.SearchScreen
 import com.aaronfabian.applejuice.presentation.sign_in.SignInScreen
@@ -50,7 +52,7 @@ class MainActivity : ComponentActivity() {
                var hideBottomBar by remember { mutableStateOf(false) }
 
                Scaffold(
-                  bottomBar = { if (hideBottomBar) null else BottomNavbar(navController) }
+                  bottomBar = { if (hideBottomBar) Unit else BottomNavbar(navController) }
                ) { it ->
                   it.calculateTopPadding()
 
@@ -74,9 +76,14 @@ class MainActivity : ComponentActivity() {
                         HomeScreen(navController = navController)
                      }
 
-                     composable(route = Screen.CoinDetailScreen.route + "/{coinId}/{coinColor}") {
+                     composable(route = Screen.CoinDetailScreen.route + "/{coinId}/{coinColor}/{coinUuid}") {
                         LaunchedEffect(Unit) { hideBottomBar = false }
                         CoinDetailScreen(navController = navController)
+                     }
+
+                     composable(route = Screen.MyCoinDetailScreen.route + "/{coinId}/{coinUuid}") {
+                        LaunchedEffect(Unit) { hideBottomBar = true }
+                        MyCoinDetailScreen(navController = navController)
                      }
 
                      composable(route = Screen.PeopleDetailScreen.route + "/{peopleId}") {
@@ -92,22 +99,23 @@ class MainActivity : ComponentActivity() {
                      }
 
                      composable(route = Screen.AccountProfileScreen.route) {
+                        LaunchedEffect(Unit) { hideBottomBar = false }
                         AccountProfileScreen(navController = navController)
                      }
 
                      composable(route = Screen.MarketScreen.route) {
-                        Text(text = "Market screen")
-                     }
-
-                     composable(route = Screen.PortfolioScreen.route) {
                         // TODO: As a log out button for a moment
 
                         val cmp = NavigationComposition.current
 
-                        Text(text = "Portfolio screen")
                         cmp.setUser(User())
                         cmp.setIsLoggedIn(false)
                         FirebaseClass().signOutUser()
+                        Text(text = "Market screen")
+                     }
+
+                     composable(route = Screen.NewsScreen.route) {
+                        NewsScreen(navController = navController)
                      }
                   }
                }

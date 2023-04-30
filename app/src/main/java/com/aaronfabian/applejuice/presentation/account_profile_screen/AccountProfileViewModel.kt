@@ -7,6 +7,7 @@ import com.aaronfabian.applejuice.domain.model.Coins
 import com.aaronfabian.applejuice.utils.Constants
 import com.aaronfabian.applejuice.utils.FirebaseClass
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +27,7 @@ class AccountProfileViewModel @Inject constructor() : ViewModel() {
          val documentCoins = FirebaseClass().getUserCoin(uid)
          val coinsList: HashMap<String, Coins> = HashMap()
 
+
          for (c in documentCoins.documents) {
             if (c["coinId"] in coinsList) {
                val fetchedAmount = c["amount"] as Double
@@ -36,6 +38,7 @@ class AccountProfileViewModel @Inject constructor() : ViewModel() {
             } else {
                val coin = Coins(
                   coinId = c["coinId"] as String,
+                  coinUuid = c["coinUuid"] as String,
                   coinName = c["coinName"] as String,
                   coinUri = c["coinUri"] as String,
                   coinColor = c["coinColor"] as String,
@@ -52,6 +55,10 @@ class AccountProfileViewModel @Inject constructor() : ViewModel() {
       } catch (e: Exception) {
          e.printStackTrace()
          Log.e(Constants.ERROR_TAG_FIREBASE, "Error at AccountViewModel :(")
+         this._state.value = AccountScreenState(isError = "Error :(")
+      } catch (e: CancellationException) {
+         e.printStackTrace()
+         Log.e(Constants.ERROR_TAG, "Error at AccountViewModel (Cancellation exception) :(")
          this._state.value = AccountScreenState(isError = "Error :(")
       }
    }

@@ -4,10 +4,12 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 object StringUtil {
    @RequiresApi(Build.VERSION_CODES.O)
@@ -35,5 +37,11 @@ object StringUtil {
       )
 
       return strCoinId.toString()
+   }
+
+   fun toReadAbleDateFromTimestamp(pattern: String, timestamp: Long): String {
+      val sdf = SimpleDateFormat(pattern, Locale.getDefault())
+      val date = Date(timestamp * 1000)
+      return sdf.format(date)
    }
 }

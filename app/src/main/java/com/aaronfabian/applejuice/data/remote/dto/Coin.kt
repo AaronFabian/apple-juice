@@ -1,7 +1,10 @@
 package com.aaronfabian.applejuice.data.remote.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class Coin(
-   val `24hVolume`: String? = "",
+   @SerializedName("24hVolume")
+   val volume24h: String? = "",
    val btcPrice: String? = "",
    val change: String? = "",
    val coinrankingUrl: String? = "",

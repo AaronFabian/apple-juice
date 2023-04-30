@@ -20,6 +20,7 @@ import com.aaronfabian.applejuice.presentation.account_profile_screen.AccountPro
 import com.aaronfabian.applejuice.presentation.account_profile_screen.components.MyCoin
 import com.aaronfabian.applejuice.presentation.ui.theme.mPrimary
 import com.aaronfabian.applejuice.presentation.ui.theme.mTextPrimary
+import com.aaronfabian.applejuice.presentation.ui.theme.partial_components.GenericLoadingUI
 import com.aaronfabian.applejuice.store.NavigationComposition
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -236,7 +237,7 @@ fun AccountProfileScreen(
                }
          ) {
             items(items = listOfMyCoin) { item ->
-               MyCoin(item)
+               MyCoin(item, navController)
             }
          }
       }
@@ -245,13 +246,16 @@ fun AccountProfileScreen(
       if (state.isLoading) {
          Box(
             modifier = Modifier
+               .fillMaxSize()
                .constrainAs(loadingUiRef) {
                   top.linkTo(spacerMyCoinList.bottom)
                   start.linkTo(parent.start)
                   end.linkTo(parent.end)
                   bottom.linkTo(parent.bottom)
                }
-         )
+         ) {
+            GenericLoadingUI()
+         }
       }
    }
 

@@ -19,4 +19,7 @@ interface CoinRankingApi {
 
    @GET("/v2/coins")
    suspend fun getCoinGraphBySymbol(@Query("symbols") symbols: String): CoinGraphDto
+
+   @GET("/v2/coins")
+   suspend fun getOneCoinByUuid(@Query("uuids[]") uuid: String): CoinDto
 }

@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.unit.dp
-import com.aaronfabian.applejuice.domain.model.CoinGraph
 import com.madrapps.plot.line.DataPoint
 import com.madrapps.plot.line.LineGraph
 import com.madrapps.plot.line.LinePlot
@@ -15,7 +14,7 @@ import com.madrapps.plot.line.LinePlot
 
 @Composable
 fun CoinDetailCanvas(
-   coinGraphData: CoinGraph,
+   coinGraphData: List<String?>?,
    graphColor: Color = Color.Green,
    modifier: Modifier
 ) {
@@ -28,7 +27,7 @@ fun CoinDetailCanvas(
       mutableStateListOf<DataPoint>()
    }
 
-   val coinGraphStr = coinGraphData.data.coins?.getOrNull(0)?.sparkline
+   val coinGraphStr = coinGraphData
 
    val dataPoints = arrayListOf<DataPoint>()
    val numberList = arrayListOf<Float>()

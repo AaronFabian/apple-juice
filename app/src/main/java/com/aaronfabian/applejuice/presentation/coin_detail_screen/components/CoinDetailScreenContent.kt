@@ -37,7 +37,8 @@ fun CoinDetailScreenContent(
    _dataStateTicker: CoinTickerState,
    _coinGraphState: CoinGraphState,
    navController: NavController,
-   coinColor: String
+   coinColor: String,
+   coinUuid: String
 ) {
    var coinDetailScreenState by remember {
       mutableStateOf("price")
@@ -176,7 +177,7 @@ fun CoinDetailScreenContent(
 
             if (allowGraph) {
                CoinDetailCanvas(
-                  _coinGraphState.coin!!,
+                  _coinGraphState.coin!!.data.coins?.getOrNull(0)?.sparkline,
                   modifier = Modifier
                      .background(MaterialTheme.colors.onError)
                      .fillMaxSize()
@@ -439,6 +440,7 @@ fun CoinDetailScreenContent(
 
                         Price(
                            coinId = dataState.id!!,
+                           coinUuid = coinUuid,
                            coinName = dataState.name!!,
                            coinSymbol = dataState.symbol!!,
                            coinTicker = _dataStateTicker.coin!!,
@@ -449,9 +451,8 @@ fun CoinDetailScreenContent(
                         )
                      }
 
-                     if (_dataStateTicker.error.isNotBlank()) {
+                     if (_dataStateTicker.error.isNotBlank())
                         PriceWhenError(errorMessage = _dataStateTicker.error)
-                     }
                   }
                   "overview" -> {
 

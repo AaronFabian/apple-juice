@@ -51,6 +51,7 @@ fun Price(
    coinTicker: CoinTicker,
    coinColor: String,
    coinLogo: String,
+   coinUuid: String,
    modifierHashMap: HashMap<String, Modifier>,
    navController: NavController,
 ) {
@@ -217,7 +218,7 @@ fun Price(
 
       if (cmp.isLoggedIn)
          CustomDialog(
-            onConfirm = { remainingBalance, coinAmount ->
+            onConfirm = { remainingBalance, coinAmount, coinValue ->
 
                if (!isAllowedToBuy.value) return@CustomDialog
 
@@ -232,17 +233,20 @@ fun Price(
 
                      val coins = Coins(
                         coinId = coinId,
+                        coinUuid = coinUuid,
                         coinName = coinName,
                         coinUri = coinLogo,
                         coinColor = coinColor,
                         ownerUid = cmp.user.uid,
                         purchaseTime = formattedTime,
                         amount = coinAmount!!.toDouble(),
+                        coinValue = coinValue!!.toDouble()
                      )
 
                      val updateMoney =
                         FirebaseClass().updateUserMoney(remainingBalance!!, cmp.user.uid)
-                     val postBoughtCoins = FirebaseClass().postPurchasedCoin(cmp.user.uid, coins)
+                     val postBoughtCoins =
+                        FirebaseClass().postPurchasedCoin(cmp.user.uid, coins)
                      if (updateMoney && postBoughtCoins) {
                         cmp.user.money = remainingBalance.toDouble()
                         isShowDialog = false
@@ -291,11 +295,13 @@ fun Price(
             onDismiss = {
                isShowDialog = false
             },
-            onConfirm = { _, _ ->
+            onConfirm = { _, _, _ ->
                navController.navigate(Screen.SignInScreen.route)
             },
             children = { onDis, onCon, _, _, _, _ ->
-               DialogChildOnShouldSignIn(onConfirm = { onCon(null, null) }, onDismiss = { onDis() })
+               DialogChildOnShouldSignIn(
+                  onConfirm = { onCon(null, null, null) },
+                  onDismiss = { onDis() })
             }
          )
    }

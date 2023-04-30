@@ -33,10 +33,10 @@ object NavbarHelperData {
       navbarData.add(nav3)
 
       val nav4 = NavbarDataClass(
-         miniText = "Portfolio",
-         drawable = R.drawable.ic_portofolio,
-         contentDescription = "Portfolio Icon Button",
-         route = Screen.PortfolioScreen.route
+         miniText = "News",
+         drawable = R.drawable.baseline_newspaper_24,
+         contentDescription = "News",
+         route = Screen.NewsScreen.route
       )
       navbarData.add(nav4)
 

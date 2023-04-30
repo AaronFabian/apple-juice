@@ -25,6 +25,9 @@ fun CoinDetailScreen(
    val state3 = viewModel.state3.value
 
    val coinColor = viewModel.coinColor
+   val coinUuid = viewModel.coinUuid
+
+   println(coinUuid)
 
    var allowCoinDetail by remember {
       mutableStateOf(false)
@@ -35,7 +38,7 @@ fun CoinDetailScreen(
    }
 
    if (allowCoinDetail) {
-      CoinDetailScreenContent(state.coin!!, state2, state3, navController, coinColor)
+      CoinDetailScreenContent(state.coin!!, state2, state3, navController, coinColor, coinUuid)
    }
 
    if (state.error.isNotBlank()) {

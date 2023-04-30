@@ -24,7 +24,7 @@ import com.aaronfabian.applejuice.store.NavigationComposition
 
 @Composable
 fun DialogChildOnConfirmBuy(
-   onConfirm: (par: String?, par2: String?) -> Unit,
+   onConfirm: (par: String?, par2: String?, par3: String?) -> Unit,
    onDismiss: () -> Unit,
    coinName: String,
    coinSymbol: String,
@@ -201,7 +201,11 @@ fun DialogChildOnConfirmBuy(
                         return@Button
                      }
 
-                     onConfirm(remainingBalance.value.toString(), coinAmount.value.toString())
+                     onConfirm(
+                        remainingBalance.value.toString(),
+                        coinAmount.value.toString(),
+                        (price.toDouble() * coinAmount.value).toString()
+                     )
                   }, colors = ButtonDefaults.buttonColors(
                      backgroundColor = if (remainingBalance.value > 0f) mPrimary else Color.LightGray,
                      contentColor = Color.White,

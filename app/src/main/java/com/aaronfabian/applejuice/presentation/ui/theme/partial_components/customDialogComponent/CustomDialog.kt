@@ -11,12 +11,12 @@ import androidx.compose.ui.window.DialogProperties
 @Composable
 fun CustomDialog(
    onDismiss: () -> Unit,
-   onConfirm: (param: String?, param2: String?) -> Unit,
+   onConfirm: (param: String?, param2: String?, param3: String?) -> Unit,
    text1: String = "",
    text2: String = "",
    text3: String = "",
    iconId: String = "",
-   children: @Composable (onDis: () -> Unit, onCon: (par: String?, par2: String?) -> Unit, text1: String, text2: String, text3: String, iconId: String) -> Unit
+   children: @Composable (onDis: () -> Unit, onCon: (par: String?, par2: String?, par3: String?) -> Unit, text1: String, text2: String, text3: String, iconId: String) -> Unit
 ) {
 
 

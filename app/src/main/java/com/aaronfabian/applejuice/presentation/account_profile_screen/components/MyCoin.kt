@@ -1,5 +1,6 @@
 package com.aaronfabian.applejuice.presentation.account_profile_screen.components
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,17 +13,36 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavController
 import com.aaronfabian.applejuice.domain.model.Coins
+import com.aaronfabian.applejuice.presentation.Screen
 import com.aaronfabian.applejuice.presentation.ui.theme.mTextPrimary
+import com.aaronfabian.applejuice.utils.pickRandomColor
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun MyCoin(coins: Coins) {
+fun MyCoin(coins: Coins, navController: NavController) {
+
+   val coinId = coins.coinId
+   val coinUuid = coins.coinUuid
+   var color: Color
+   try {
+      color = Color(android.graphics.Color.parseColor(coins.coinColor))
+   } catch (e: Exception) {
+      Log.w("Color warning", e.message!!)
+      color = Color(android.graphics.Color.parseColor(pickRandomColor()))
+   }
+
+   val onClickMyCoinDetail = {
+      println("$coinId -> $coinUuid")
+
+      navController.navigate(Screen.MyCoinDetailScreen.route + "/$coinId/$coinUuid")
+   }
+
    Card(
       backgroundColor = Color.Transparent,
-      elevation = 8.dp,
       shape = RoundedCornerShape(8.dp),
       modifier = Modifier
          .height(60.dp)
@@ -30,10 +50,10 @@ fun MyCoin(coins: Coins) {
          .border(
             shape = RoundedCornerShape(8.dp),
             width = 1.dp,
-            color = Color(android.graphics.Color.parseColor(coins.coinColor))
+            color = color
          )
          .clickable {
-            println(coins.coinId)
+            onClickMyCoinDetail()
          }
    ) {
       ConstraintLayout(
